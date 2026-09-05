@@ -27,9 +27,13 @@ is_admin boolean default false,
 created_at timestamp default current_timestamp(),
 company_id int,
 team_id int,
+reset_token varchar(255),
+reset_token_expires_at timestamp,
 foreign key (company_id) references Company(company_id),
 foreign key (team_id) references Team(team_id)
 );
+
+
 
 create table Objective (
 objective_id int auto_increment primary key,
@@ -46,7 +50,7 @@ name varchar(50) not null,
 description varchar(500),
 status varchar(50) default 'pending',   -- pending, in progress, complete, overdue
 importance int,
-deadline date,
+deadline timestamp,
 duration int,
 difficulty int,
 team_id int,
@@ -76,7 +80,8 @@ author int,
 task int,
 foreign key (author) references User (user_id),
 foreign key (task) references Task (task_id)
-)
+);
+
 
 
 

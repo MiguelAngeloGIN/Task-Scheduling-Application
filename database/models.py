@@ -1,9 +1,12 @@
-import db_connection
+from database import db_connection
 from sqlalchemy import Integer, String, Numeric, Boolean, Column, ForeignKey, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 
 Base = declarative_base()
+
+Session = sessionmaker(bind=db_connection.engine)
+session = Session()
 
 
 class Company(Base):
@@ -28,6 +31,7 @@ class Team(Base):
     users = relationship("User", back_populates="team")
     tasks = relationship("Task", back_populates="team")
 
+
 class User(Base):
     __tablename__ = "User"
 
@@ -38,6 +42,8 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
+    reset_token = Column(String(255))
+    reset_token_expires_at = Column(TIMESTAMP)
     company_id = Column(Integer, ForeignKey("Company.company_id"))
     team_id = Column(Integer, ForeignKey("Team.team_id"))
     company = relationship("Company", back_populates="users")
