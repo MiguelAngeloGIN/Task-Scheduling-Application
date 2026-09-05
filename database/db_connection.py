@@ -8,7 +8,7 @@ user = os.getenv("MY_USER")
 password = os.getenv("MY_PASSWORD")
 database = os.getenv("MY_DATABASE")
 
-engine = create_engine(f"mysql+pymysql://{user}:{password}@localhost/{database}", echo=True)
+engine = create_engine(f"mysql+pymysql://{user}:{password}@localhost/{database}")
 
 Session = sessionmaker(bind=engine)
 

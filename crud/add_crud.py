@@ -25,6 +25,7 @@ class Add_Sql:
         )
         session.add(new_user)
         session.commit()
+        print(f"User {new_user.user_id} added.")
 
     @staticmethod
     def add_team(name, company_id):
@@ -34,6 +35,7 @@ class Add_Sql:
         )
         session.add(new_team)
         session.commit()
+        print(f"Team {new_team.team_id} added.")
 
     @staticmethod
     def add_objective(name, description, company_id):
@@ -44,6 +46,7 @@ class Add_Sql:
         )
         session.add(new_objective)
         session.commit()
+        print(f"Objective {new_objective.objective_id} added.")
 
     @staticmethod
     def add_task(name, description, status, importance, deadline, duration, difficulty, team_id, objective_id):
@@ -60,6 +63,7 @@ class Add_Sql:
         )
         session.add(new_task)
         session.commit()
+        print(f"Task {new_task.task_id} added.")
 
     @staticmethod
     def add_dependency(dependant_id, dependency_id):
@@ -69,6 +73,7 @@ class Add_Sql:
         )
         session.add(new_dependency)
         session.commit()
+        print(f"Dependency {new_dependency.dependency_id} added.")
 
     @staticmethod
     def add_task_history(action, description, old_value, new_value, author_id, task_id):
@@ -82,3 +87,7 @@ class Add_Sql:
         )
         session.add(new_task_history)
         session.commit()
+        print(f"TaskHistory {new_task_history.task_history_id} added.")
+
+
+    
