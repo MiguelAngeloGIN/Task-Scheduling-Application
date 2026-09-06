@@ -1,9 +1,20 @@
 
-# use dfs to detect circular dependencies in the task dependency graph
-# graph = { all taks id : dependencies list}, directed from id to dependencies
 
-# recursive approach
 def check_circular_dependencies(task_graph):
+    """
+    Detect circular dependencies in a directed task graph.
+    DFS recursive approach
+
+    Args:
+        task_graph (dict): {task_id: [dependency_ids]} mapping.
+
+    Returns:
+        dict: {
+            "has_cycle": bool,
+            "culprit": task_id (if cycle),
+            "cycle": [task_ids forming the cycle]
+        }
+ """
     seen = set()
     current_path = []
 
