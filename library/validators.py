@@ -115,6 +115,15 @@ class InputValidator:
 
         return data
 
+    @staticmethod 
+    def validate_id(id_value):
+       if not isinstance(id_value, int):
+          raise ValueError("ID must be an integer.")
+       if id_value <= 0:
+          raise ValueError("ID must be a positive integer.")
+       return id_value
+
+
     @staticmethod
     def validate_dependencies(dependencies):
         if dependencies is not None:

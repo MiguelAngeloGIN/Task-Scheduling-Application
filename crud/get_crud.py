@@ -14,3 +14,6 @@ class Get_Sql:
                 raise ValueError(f"{model.__name__} has no attribute '{key}'.")
         results = query.all()
         return results
+
+
+

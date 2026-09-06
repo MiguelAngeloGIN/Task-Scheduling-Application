@@ -9,6 +9,7 @@ class Add_Sql:
         new_company = models.Company(name=name)
         session.add(new_company)
         session.commit()
+        return new_company
 
     @staticmethod
     def add_user(first_name, last_name, email, password_hash, company_id, team_id, reset_token=None, reset_token_expires_at=None, is_admin=False):
@@ -26,6 +27,7 @@ class Add_Sql:
         session.add(new_user)
         session.commit()
         print(f"User {new_user.user_id} added.")
+        return new_user
 
     @staticmethod
     def add_team(name, company_id):
@@ -36,6 +38,7 @@ class Add_Sql:
         session.add(new_team)
         session.commit()
         print(f"Team {new_team.team_id} added.")
+        return new_team
 
     @staticmethod
     def add_objective(name, description, company_id):
@@ -47,6 +50,9 @@ class Add_Sql:
         session.add(new_objective)
         session.commit()
         print(f"Objective {new_objective.objective_id} added.")
+        return new_objective
+
+
 
     @staticmethod
     def add_task(name, description, status, importance, deadline, duration, difficulty, team_id, objective_id):
@@ -64,6 +70,7 @@ class Add_Sql:
         session.add(new_task)
         session.commit()
         print(f"Task {new_task.task_id} added.")
+        return new_task
 
     @staticmethod
     def add_dependency(dependant_id, dependency_id):
@@ -74,6 +81,7 @@ class Add_Sql:
         session.add(new_dependency)
         session.commit()
         print(f"Dependency {new_dependency.dependency_id} added.")
+        return new_dependency
 
     @staticmethod
     def add_task_history(action, description, old_value, new_value, author_id, task_id):
@@ -88,6 +96,9 @@ class Add_Sql:
         session.add(new_task_history)
         session.commit()
         print(f"TaskHistory {new_task_history.task_history_id} added.")
+        return new_task_history
+
+    
 
 
     
