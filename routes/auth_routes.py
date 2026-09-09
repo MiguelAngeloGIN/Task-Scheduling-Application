@@ -4,7 +4,7 @@ from components.auth_components import Pages
 from fasthtml import common as c
 from core.app import rt
 
-print("AUTH ROUTES LOADED")
+
 @rt('/signup', methods=['GET'])
 def get_signup():
     return Pages.signup_page()
@@ -34,34 +34,34 @@ def post_signup(first_name: str, last_name: str, email: str, password: str):
         )
 
 
-# @rt('/login', methods=['GET'])
-# def get_login(message: Optional[str] = None, message_type: Optional[str] = None):
-#     return Pages.login_page(message=message, message_type=message_type)
+@rt('/login', methods=['GET'])
+def get_login(message: Optional[str] = None, message_type: Optional[str] = None):
+     return Pages.login_page(message=message, message_type=message_type)
 
 
-# @rt('/login', methods=['POST'])
-# def post_login(email: str, password: str):
-#     try:
-#         token = UserService().login(email=email, password=password)
+@rt('/login', methods=['POST'])
+def post_login(email: str, password: str):
+    try:
+        token = UserService().login(email=email, password=password)
 
-#         response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
-#         response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
-#         ## secure = False to allow testing on localhost, should be True in production with HTTPS
-#         return response
+        response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
+        response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
+        ## secure = False to allow testing on localhost, should be True in production with HTTPS
+        return response
     
-#     except ValueError as e:
-#         return Pages.login_page(
-#             message=str(e),
-#             message_type="error",
-#             email=email
-#         )
+    except ValueError as e:
+        return Pages.login_page(
+            message=str(e),
+            message_type="error",
+            email=email
+        )
 
     
-# @rt('/logout', methods=['POST'])
-# def post_logout():
-#     response = c.RedirectResponse('/login?message=Logged out&message_type=success', status_code=302)
-#     response.delete_cookie("jwt_token")
-#     return response
+@rt('/logout', methods=['POST'])
+def post_logout():
+    response = c.RedirectResponse('/login?message=Logged out&message_type=success', status_code=302)
+    response.delete_cookie("jwt_token")
+    return response
 
 
 # @rt('/reset-password', methods = ['GET'])

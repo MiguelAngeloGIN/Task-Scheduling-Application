@@ -45,7 +45,6 @@ class UserService:
     @staticmethod
     def login(email, password):
         email = InputValidator.validate_email(email)
-        password = InputValidator.validate_password(password)
 
         users = Get_Sql.get_sql(models.User, email=email)
         if not users:
@@ -54,7 +53,7 @@ class UserService:
         try:
             UserService.ph.verify(user.password_hash, password)
         except VerifyMismatchError:
-            raise ValueError("Incorrect password.")
+            raise ValueError("Incorrect email or password!")
 
         payload = {
             "sub": str(user.user_id),
