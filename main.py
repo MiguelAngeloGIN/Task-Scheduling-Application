@@ -2,6 +2,7 @@ from core.app import app, rt
 
 import routes.auth_routes
 import routes.task_routes
+import routes.admin_routes
 
 @rt('/')
 def root():
