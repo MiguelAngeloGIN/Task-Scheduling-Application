@@ -1,5 +1,5 @@
 from database import db_connection
-from sqlalchemy import Integer, String, Numeric, Boolean, Column, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Integer, String, Numeric, Boolean, Column, ForeignKey, JSON, TIMESTAMP, func
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 
@@ -41,6 +41,7 @@ class User(Base):
     email = Column(String(50), nullable=False)
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False)
+    is_team_leader = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     reset_token = Column(String(255))
     reset_token_expires_at = Column(TIMESTAMP)
@@ -94,10 +95,10 @@ class TaskHistory(Base):
     __tablename__ = "Task_History"
 
     task_history_id = Column(Integer, primary_key=True, autoincrement=True)
-    action = Column(String(50), nullable=False)  # update, complete, delete, create
+    action = Column(String(50), nullable=False)  # update, delete, create, add_dependency, remove_dependency
     description = Column(String(500))  # changes explanation
-    old_value = Column(String(500))
-    new_value = Column(String(500))
+    old_value = Column(JSON)  
+    new_value = Column(JSON)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     author = Column(Integer, ForeignKey("User.user_id"))
     task = Column(Integer, ForeignKey("Task.task_id"))

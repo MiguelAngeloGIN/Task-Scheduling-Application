@@ -2,6 +2,8 @@ create schema Scheduler;
 
 use Scheduler;
 
+select  * from task;
+
 create table Company (
 company_id int auto_increment primary key,
 name varchar (50) not null unique,
@@ -25,6 +27,7 @@ last_name varchar(50) not null,
 email varchar(50) not null unique,
 password_hash varchar (255) not null,
 is_admin boolean default false,
+is_team_leader boolean default false,
 created_at timestamp default current_timestamp(),
 company_id int not null,
 team_id int not null,
@@ -49,7 +52,7 @@ create table Task (
 task_id int auto_increment primary key,
 name varchar(50) not null,
 description varchar(500),
-status varchar(50) default 'pending',   -- pending, in progress, complete, overdue
+status varchar(50) default 'pending',   -- pending, complete, overdue
 importance int,
 deadline timestamp,
 duration int,
@@ -72,10 +75,10 @@ foreign key (dependency) references Task(task_id) on delete cascade
 
 create table Task_History(
 task_history_id int auto_increment primary key,
-action varchar(50) not null, -- update, complete, delete, create
-description varchar(500), -- changes explanation
-old_value varchar(500),
-new_value varchar(500),
+action varchar(50) not null, 
+description varchar(500), 
+old_value JSON,
+new_value JSON,
 created_at timestamp default current_timestamp(),
 author int not null,
 task int not null,
@@ -84,9 +87,6 @@ foreign key (task) references Task (task_id) on delete cascade
 )
 
 
-ALTER TABLE User ADD UNIQUE (email);
-ALTER TABLE Company ADD UNIQUE (name);
-ALTER TABLE Team ADD UNIQUE (company_id, name);
 
 
 CREATE INDEX idx_user_company ON User(company_id);
@@ -100,6 +100,17 @@ CREATE INDEX idx_dependency_dependency ON Dependency(dependency);
 
 CREATE INDEX idx_history_task ON Task_History(task);
 CREATE INDEX idx_history_author ON Task_History(author);
+
+
+
+
+
+SHOW CREATE TABLE Task_History;
+
+
+
+
+
 
 
 

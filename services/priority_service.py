@@ -8,6 +8,7 @@ class PriorityService:
         - Importance (35%): User-defined importance (1 - 5).
         - Duration (15%): Shorter tasks are prioritized (SJF).
         - Difficulty (10%): User preference for hardest or easiest tasks.
+        - Dependencies: Ensures tasks are scheduled after their dependencies.
     """
 
     @staticmethod
@@ -65,5 +66,37 @@ class PriorityService:
         key=lambda task: task.get('priority_score', 0), 
         reverse=True
     )
+
+    @staticmethod
+    def apply_dependency_order(sorted_tasks, dependencies):
+        """
+        DFS-based reorder of tasks based on dependencies, ensuring that dependent tasks come after their dependencies.
+
+        Args:
+            sorted_tasks (list): List of tasks sorted by priority.
+            dependencies (list): List of dependency relationships, each represented as an object with 'dependant' and 'dependency' attributes.
+
+        Returns:
+            list: Reordered list of tasks respecting dependencies.
+        """
+
+        task_dict = {task.id: task for task in sorted_tasks}
+        ordered_tasks = []
+        visited = set()
+
+        def visit(task_id):
+            if task_id in visited:
+                return
+            visited.add(task_id)
+            for dep in dependencies:
+                if dep.dependant == task_id:
+                    visit(dep.dependency)
+            if task_id in task_dict:
+                ordered_tasks.append(task_dict[task_id])
+
+        for task in sorted_tasks:
+            visit(task.id)
+
+        return ordered_tasks
 
      
