@@ -1,15 +1,12 @@
-from fasthtml import common as c
-from routes import auth_routes, task_routes
 from core.app import app, rt
 
+import routes.auth_routes
+import routes.task_routes
 
 @rt('/')
-def get():
-    return c.RedirectResponse('/signup', status_code=302)
+def root():
+    return c.RedirectResponse('/signup', status_code = 302)
 
 
+from fasthtml import common as c
 c.serve()
-
-
-
-
