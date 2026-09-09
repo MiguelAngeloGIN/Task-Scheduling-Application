@@ -30,7 +30,7 @@ class UserService:
 
     @staticmethod
     def sign_up(first_name, last_name, email, password, team_id, company_id):
-        # Validate inputs
+       
         first_name = InputValidator.validate_name(first_name)
         last_name = InputValidator.validate_name(last_name)
         email = InputValidator.validate_email(email)
@@ -63,7 +63,8 @@ class UserService:
             "email": user.email,
             "exp": datetime.now(timezone.utc) + timedelta(hours=24),  
             "iat": datetime.now(timezone.utc),
-            "admin" : user.is_admin
+            "admin" : user.is_admin,
+            "team_leader": user.is_team_leader
         }
 
         token = JWTUtils.generate_jwt(payload)

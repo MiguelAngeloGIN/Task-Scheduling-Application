@@ -1,0 +1,103 @@
+from services.user_service import UserService
+from typing import Optional
+from components.auth_components import Pages
+from fasthtml import common as c
+from core.app import rt
+
+
+@rt('/signup', methods=['GET'])
+def get_signup():
+    return Pages.signup_page()
+
+    
+@rt('/signup', methods=['POST'])
+def post_signup(first_name: str, last_name: str, usertype: str, email: str, password: str):
+    try:
+        UserService().sign_up(
+            first_name=first_name,
+            last_name=last_name,
+            user_type=usertype,
+            email=email,
+            password=password
+        )
+        return c.RedirectResponse('/login?message=Account created successfully&message_type=success', status_code=302)
+    
+    except ValueError as e:
+        return Pages.signup_page(
+            message=str(e),
+            message_type="error",
+            first_name=first_name,
+            last_name=last_name,
+            usertype=usertype,
+            email=email
+        )
+
+
+@rt('/login', methods=['GET'])
+def get_login(message: Optional[str] = None, message_type: Optional[str] = None):
+    return Pages.login_page(message=message, message_type=message_type)
+
+
+@rt('/login', methods=['POST'])
+def post_login(email: str, password: str):
+    try:
+        token = UserService().login(email=email, password=password)
+
+        response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
+        response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
+        ## secure = False to allow testing on localhost, should be True in production with HTTPS
+        return response
+    
+    except ValueError as e:
+        return Pages.login_page(
+            message=str(e),
+            message_type="error",
+            email=email
+        )
+
+    
+@rt('/logout', methods=['POST'])
+def post_logout():
+    response = c.RedirectResponse('/login?message=Logged out&message_type=success', status_code=302)
+    response.delete_cookie("jwt_token")
+    return response
+
+
+@rt('/reset-password', methods = ['GET'])
+def get_password_reset():
+    return Pages.reset_password_page()
+
+@rt('/reset-password', methods = ['POST'])
+def post_password_reset(email: str):
+    try:
+        UserService().create_reset_token(email=email)
+        return c.RedirectResponse(f'/paste-token?email={email}&message=Password reset token created and sent to your email&message_type=success', status_code=302)
+    except ValueError as e:
+        return Pages.reset_password_page(message=str(e), message_type="error")
+
+
+@rt('/paste-token', methods = ['GET'])
+def get_paste_token( message: Optional[str] = None, message_type: Optional[str] = None, email: str = ''):
+    return Pages.paste_token_page(email=email, message=message, message_type=message_type)
+
+
+@rt('/paste-token', methods = ['POST'])
+def post_paste_token(email: str, token: str):
+    try:
+        UserService().verify_reset_token(email=email, token=token)
+        return c.RedirectResponse(f'/new-password?email={email}&token={token}&message=Password reset token verified&message_type=success', status_code=302)
+    except ValueError as e:
+        return Pages.paste_token_page(email=email, message=str(e), message_type="error")
+
+@rt('/new-password', methods = ['GET'])
+def get_new_password(message: Optional[str] = None, message_type: Optional[str] = None, email: str = '', token: str = ''):
+    return Pages.new_password_page(message=message, message_type=message_type, email=email, token=token)
+
+@rt('/new-password', methods = ['POST'])
+def post_new_password(email: str, token: str, new_password: str):
+    try:
+        UserService().reset_password(email=email, token=token, new_password=new_password)
+        return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
+    except ValueError as e:
+        return Pages.new_password_page(message=str(e), message_type="error", email=email, token=token)
+

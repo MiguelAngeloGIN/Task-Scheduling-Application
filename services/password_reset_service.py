@@ -62,7 +62,7 @@ class ResetService:
         ResetService.verify_reset_token(email, token)
 
         from library.validators import InputValidator
-        from services.user_services import UserService
+        from services.user_service import UserService
 
         InputValidator.validate_password(new_password)
         new_password_hash = UserService.ph.hash(new_password)
