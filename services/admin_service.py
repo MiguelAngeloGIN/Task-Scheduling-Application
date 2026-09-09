@@ -12,6 +12,12 @@ from utils.email_util import send_email
 
 class AdminService:
 
+    @staticmethod
+    def create_company(name):
+        InputValidator.validate_name(name)
+
+        return query_handling(Add_Sql.add_company, name=name, error="Company name already exists.")
+
    
     @staticmethod
     def create_invitation_link(invited_email, company_id, invited_by):
@@ -27,10 +33,7 @@ class AdminService:
         if not company:
             raise ValueError("Company does not exist.")
 
-        admin = Get_Sql.get_sql(
-            models.User,
-            user_id=invited_by
-        )
+        admin = Get_Sql.get_sql(models.User, user_id=invited_by)
 
         if not admin:
             raise ValueError("Inviting user does not exist.")
@@ -40,10 +43,7 @@ class AdminService:
         if admin.company_id != company_id:
             raise ValueError("Admin does not belong to this company.")
 
-        invited_user = Get_Sql.get_sql(
-            models.User,
-            email=invited_email
-        )
+        invited_user = Get_Sql.get_sql(models.User, email=invited_email)
 
         if not invited_user:
             raise ValueError("User with this email does not exist.")
@@ -53,7 +53,7 @@ class AdminService:
         if invited_user.company_id == company_id:
             raise ValueError("User is already in this company.")
 
-        # A user can only belong to one company
+        
         if invited_user.company_id is not None:
             raise ValueError("User already belongs to another company.")
 
@@ -76,15 +76,8 @@ class AdminService:
             f"http://localhost:5001/invite/{token}"
         )
 
-        query_handling(
-            Add_Sql.add_invitation,
-            company_id=company_id,
-            user_id=invited_user.user_id,
-            invited_by=invited_by,
-            token=token,
-            expires_at=expiration_time,
-            error="Failed to create invitation."
-        )
+        query_handling(Add_Sql.add_invitation, company_id=company_id, user_id=invited_user.user_id, invited_by=invited_by,
+                        token=token, expires_at=expiration_time, error="Failed to create invitation.")
 
         return invitation_link
 
@@ -103,11 +96,7 @@ class AdminService:
             f"{company_name}: {invitation_link}"
         )
 
-        send_email(
-            to_email=invited_email,
-            subject=subject,
-            body=body
-        )
+        send_email(to_email=invited_email, subject=subject, body=body)
 
 
     @staticmethod
@@ -115,46 +104,29 @@ class AdminService:
         InputValidator.validate_id(user_id)
         InputValidator.validate_id(company_id)
 
-        company = Get_Sql.get_sql(
-            models.Company,
-            company_id=company_id
-        )
+        company = Get_Sql.get_sql(models.Company, company_id=company_id)
 
         if not company:
             raise ValueError("Company does not exist.")
 
-        user = Get_Sql.get_sql(
-            models.User,
-            user_id=user_id
+        user = Get_Sql.get_sql(models.User, user_id=user_id
         )
 
         if not user:
             raise ValueError("User does not exist.")
 
-        return query_handling(
-            Update_Sql.update_sql,
-            model=models.User,
-            user_id=user_id,
-            company_id=company_id
-        )
+        return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id, company_id=company_id)
 
     @staticmethod
     def delete_user_from_company(user_id):
         InputValidator.validate_id(user_id)
 
-        user = Get_Sql.get_sql(
-            models.User,
-            user_id=user_id
-        )
+        user = Get_Sql.get_sql(models.User, user_id=user_id)
 
         if not user:
             raise ValueError("User does not exist.")
 
-        return query_handling(
-            Update_Sql.update_sql,
-            model=models.User,
-            user_id=user_id,
-            company_id=None
+        return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id, company_id=None
         )
 
 
@@ -163,10 +135,7 @@ class AdminService:
         InputValidator.validate_name(team_name)
         InputValidator.validate_id(company_id)
 
-        company = Get_Sql.get_sql(
-            models.Company,
-            company_id=company_id
-        )
+        company = Get_Sql.get_sql(models.Company, company_id=company_id)
 
         if not company:
             raise ValueError("Company does not exist.")

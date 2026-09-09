@@ -12,8 +12,7 @@ def get_signup():
     
 @rt('/signup', methods=['POST'])
 def post_signup(first_name: str, last_name: str, email: str, password: str):
-    print("POST /signup triggered")
-
+   
     try:
         UserService().sign_up(
             first_name=first_name,
@@ -32,6 +31,40 @@ def post_signup(first_name: str, last_name: str, email: str, password: str):
             last_name=last_name,
             email=email
         )
+
+@rt('/admin-signup', methods=['GET'])
+def get_admin_signup():
+    return Pages.signup_page(action='/company-signup')
+
+@rt('/company-signup', methods=['POST'])
+def post_company_signup(first_name: str, last_name: str,
+                        email: str, password: str):
+    try:
+        UserService.sign_up(
+            first_name=first_name,
+            last_name=last_name,
+            email=email,
+            password=password,
+            is_admin=True
+        )
+
+        return c.RedirectResponse(
+            '/create-company',
+            status_code=302
+        )
+
+    except ValueError as e:
+        return Pages.signup_page(action='/company-signup',
+            message=str(e),
+            message_type="error",
+            first_name=first_name,
+            last_name=last_name,
+            email=email
+        )
+
+
+
+    
 
 
 @rt('/login', methods=['GET'])
