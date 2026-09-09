@@ -86,6 +86,17 @@ foreign key (task) references Task (task_id) on delete cascade
 )
 
 
+CREATE TABLE Invitation (
+    invitation_id int auto_increment primary key,
+    company_id int not null,
+    invited_email varchar (50) not null,
+    invited_by int not null,
+    token varchar(255) not null unique,
+    created_at timestamp  default current_timestamp,
+    expires_at timestamp,
+    foreign key (company_id) references Company(company_id),
+    foreign key (invited_by) references User(user_id)
+);
 
 
 CREATE INDEX idx_user_company ON User(company_id);
@@ -108,8 +119,7 @@ SHOW CREATE TABLE Task_History;
 
 
 
-
-
+SELECT * from user;
 
 
 

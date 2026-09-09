@@ -4,9 +4,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()  
-class EmailSender:
-    @staticmethod
-    def send_email(to_email, subject, body):
+
+   
+def send_email(to_email, subject, body):
         email_user = os.getenv("EMAIL_USER")
         email_password = os.getenv("EMAIL_PASSWORD")
 

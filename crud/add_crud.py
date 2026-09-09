@@ -99,6 +99,21 @@ class Add_Sql:
         print(f"TaskHistory {new_task_history.task_history_id} added.")
         return new_task_history
 
+
+    @staticmethod
+    def add_invitation(company_id, invited_email, invited_by, token, expires_at):
+        new_invitation = models.Invitation(
+            company_id=company_id,
+            invited_email=invited_email,
+            invited_by=invited_by,
+            token=token,
+            expires_at=expires_at
+        )
+        session.add(new_invitation)
+        session.commit()
+        print(f"Invitation {new_invitation.invitation_id} added.")
+        return new_invitation
+
     
 
 

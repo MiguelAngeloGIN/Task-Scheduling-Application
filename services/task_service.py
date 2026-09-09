@@ -72,7 +72,8 @@ class TaskService:
                     new_values[key] = kwargs[key]
 
                 
-        Update_Sql.update_sql(models.Task, task_id = task_id, **kwargs)
+        Update_Sql.update_sql(models.Task, task_id = task_id, **kwargs)        
+    
         
         if old_values:
             Add_Sql.add_task_history(action="update", description=update_description, old_value=old_values, new_value=new_values, author_id=author_id, task_id=task_id)

@@ -17,7 +17,7 @@ class UserService:
     def add_company(name):
         name = InputValidator.validate_name(name)
 
-        query_handling(Add_Sql.add_company, name, 
+        return query_handling(Add_Sql.add_company, name, 
                        error="Company with this name already exists.")
         
     @staticmethod
@@ -48,7 +48,7 @@ class UserService:
 
         users = Get_Sql.get_sql(models.User, email=email)
         if not users:
-            raise ValueError("User with this email does not exist.")
+            raise ValueError("Incorrect email or password!")
         user = users[0]
         try:
             UserService.ph.verify(user.password_hash, password)

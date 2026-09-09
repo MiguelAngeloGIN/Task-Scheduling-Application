@@ -1,5 +1,5 @@
 import secrets
-from utils.email_util import EmailSender
+from utils.email_util import send_email
 from datetime import datetime, timezone, timedelta
 from crud.get_crud import Get_Sql
 from crud.update_crud import Update_Sql
@@ -24,7 +24,7 @@ class ResetService:
         Update_Sql.update_sql(models.User, user_id = user_id, reset_token = new_token, reset_token_expires_at = expiry)
 
         try:
-            EmailSender.send_email (to_email = email, 
+            send_email(to_email = email, 
                          subject = "Your password reset token",
                          body = f"Below is your password reset token. It will expire in 30 minutes\n {new_token}")
             return {"success": True, "message": "Reset token sent successfully!"}
@@ -71,7 +71,7 @@ class ResetService:
                                reset_token=None, reset_token_expires_at=None)
 
         try:
-            EmailSender.send_email(to_email=email,
+            send_email(to_email=email,
                                    subject="Your password has been reset",
                                    body="Your password has been successfully reset. If you did not initiate this change, please contact support immediately.")
         except Exception as e:

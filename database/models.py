@@ -19,6 +19,7 @@ class Company(Base):
     teams = relationship("Team", back_populates="company")
     users = relationship("User", back_populates="company")
     objectives = relationship("Objective", back_populates="company")
+    invitations = relationship("Invitation", back_populates="company")
 
 class Team(Base):
     __tablename__ = "Team"
@@ -38,7 +39,7 @@ class User(Base):
     user_id = Column(Integer, primary_key=True, autoincrement=True)
     first_name = Column(String(50), nullable=False)
     last_name = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=False)
+    email = Column(String(50), nullable=False, unique=True)
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False)
     is_team_leader = Column(Boolean, default=False)
@@ -50,6 +51,9 @@ class User(Base):
     company = relationship("Company", back_populates="users")
     team = relationship("Team", back_populates="users")
     task_histories = relationship("TaskHistory", back_populates="author_user")
+    sent_invitations = relationship("Invitation", back_populates="inviter")
+    
+
 
 
 class Objective(Base):
@@ -104,3 +108,19 @@ class TaskHistory(Base):
     task = Column(Integer, ForeignKey("Task.task_id"))
     author_user = relationship("User", foreign_keys=[author], back_populates="task_histories")
     task_obj = relationship("Task", foreign_keys=[task], back_populates="task_histories")
+    
+
+
+class Invitation(Base):
+    __tablename__ = "Invitation"
+
+    invitation_id = Column(Integer, primary_key=True, autoincrement=True)
+    company_id = Column(Integer, ForeignKey("Company.company_id"), nullable=False)
+    invited_by = Column(Integer, ForeignKey("User.user_id"), nullable=False)
+    invited_email = Column(String(50), nullable=False)
+    token = Column(String(255), unique=True, nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
+    expires_at = Column(TIMESTAMP)
+    company = relationship("Company", foreign_keys=[company_id], back_populates="invitations")
+    inviter = relationship("User", foreign_keys=[invited_by], back_populates="sent_invitations")
+    
