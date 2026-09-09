@@ -29,14 +29,13 @@ password_hash varchar (255) not null,
 is_admin boolean default false,
 is_team_leader boolean default false,
 created_at timestamp default current_timestamp(),
-company_id int not null,
-team_id int not null,
+company_id int,
+team_id int,
 reset_token varchar(255),
 reset_token_expires_at timestamp,
 foreign key (company_id) references Company(company_id) on delete cascade,
 foreign key (team_id) references Team(team_id) on delete cascade
 );
-
 
 
 create table Objective (

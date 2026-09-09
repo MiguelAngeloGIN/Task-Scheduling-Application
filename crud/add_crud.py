@@ -12,17 +12,18 @@ class Add_Sql:
         return new_company
 
     @staticmethod
-    def add_user(first_name, last_name, email, password_hash, company_id, team_id, reset_token=None, reset_token_expires_at=None, is_admin=False):
+    def add_user(first_name, last_name, email, password_hash, reset_token=None, reset_token_expires_at=None, is_admin=False, is_team_leader=False):
         new_user = models.User(
             first_name=first_name,
             last_name=last_name,
             email=email,
             password_hash=password_hash,
-            company_id=company_id,
-            team_id=team_id,
+            company_id=None,
+            team_id=None,
             reset_token=reset_token,
             reset_token_expires_at=reset_token_expires_at,
-            is_admin=is_admin
+            is_admin=is_admin,
+            is_team_leader=is_team_leader
         )
         session.add(new_user)
         session.commit()

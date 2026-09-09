@@ -29,18 +29,16 @@ class UserService:
                               error="Team with this name already exists.")
 
     @staticmethod
-    def sign_up(first_name, last_name, email, password, team_id, company_id):
+    def sign_up(first_name, last_name, email, password):
        
         first_name = InputValidator.validate_name(first_name)
         last_name = InputValidator.validate_name(last_name)
         email = InputValidator.validate_email(email)
         password = InputValidator.validate_password(password)
-        team_id = InputValidator.validate_id(team_id)
-        company_id = InputValidator.validate_id(company_id)
 
         password_hash = UserService.ph.hash(password)
-
-        return query_handling(Add_Sql.add_user, first_name, last_name, email, password_hash, team_id, company_id,
+       
+        return query_handling(Add_Sql.add_user, first_name, last_name, email, password_hash,
                               error="User with this email already exists.")
 
 

@@ -1,7 +1,7 @@
 from fasthtml import common as c
 class Pages:
     @staticmethod
-    def signup_page(message=None, message_type=None, first_name='', last_name='', usertype='', email=''):
+    def signup_page(message=None, message_type=None, first_name='', last_name='', email=''):
         return c.Titled('Sign Up',
                                    c.Div(
                                        c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
@@ -12,9 +12,6 @@ class Pages:
                                              c.Label('Last Name: ', c.Input(type='text', name='last_name', value=last_name)),
                                              c.Br(),
                                               c.Br(),
-                                              c.Label('Usertype: ', c.Input( type = "radio", name = "usertype", value = "student", checked=usertype=="student", required=True), c.Span('Student'),
-                                              c.Input( type = "radio", name = "usertype", value = "professional", checked=usertype=="professional", required=True), c.Span('Professional'),
-                                              c.Input( type = "radio", name = "usertype", value = "business", checked=usertype=="business", required=True), c.Span('Business')),
                                          c.Label('Email: ', c.Input(type='email', name='email', value=email)),
                                          c.Br(),
                                          c.Label('Password: ', c.Input(type='password', name='password')),
