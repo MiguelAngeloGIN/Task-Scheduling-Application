@@ -69,6 +69,18 @@ class Pages:
                         c.A("Request a new reset link", href="/reset-password")
                        )
 
+
+   
+    @staticmethod
+    def reset_email_sent_page():
+        return c.Titled( "Check Your Email",
+        c.Div(
+            c.P("A password reset link has been sent to your email."),
+            c.P("Please check your inbox and click the link to continue."),
+            c.A("Back to login", href="/login")
+        )
+    )
+
     @staticmethod
     def new_password_page(message=None, message_type=None, token=''):
         return c.Titled('New Password',
@@ -76,6 +88,7 @@ class Pages:
                                    c.P('Please enter your new password.'),
                                          c.Form(
                                              c.Label('New Password: ', c.Input(type='password', name='new_password')),
+                                             c.Label ('Confirm Password: ', c.Input(type='password', name='confirm_password')),
                                              c.Input(type="hidden", name="token", value=token),
                                              c.Br(),
                                              c.Br(),

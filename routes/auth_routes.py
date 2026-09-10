@@ -107,7 +107,7 @@ def get_password_reset():
 def post_password_reset(email: str):
     try:
         ResetService().create_reset_link(email=email)
-        return c.RedirectResponse(f'/paste-token?email={email}&message=Password reset token created and sent to your email&message_type=success', status_code=302)
+        return Pages.reset_email_sent_page()
     except ValueError as e:
         return Pages.reset_password_page(message=str(e), message_type="error")
 
@@ -121,10 +121,15 @@ def get_new_password(message: Optional[str] = None, message_type: Optional[str] 
         return Pages.invalid_token_page(message=str(e), message_type="error")
 
 @rt('/new-password', methods = ['POST'])
-def post_new_password(token: str, new_password: str):
+def post_new_password(token: str, new_password: str, confirm_password: str):
     try:
+        if new_password != confirm_password:
+            raise ValueError("The passwords do not match.")
+
         ResetService().reset_password(token=token, new_password=new_password)
         return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
     except ValueError as e:
-        return Pages.invalid_token_page(message=str(e), message_type="error")
+        if "token" in str(e).lower():
+            return Pages.invalid_token_page(message=str(e), message_type="error")
+        return Pages.new_password_page(message=str(e), message_type="error", token=token)
 

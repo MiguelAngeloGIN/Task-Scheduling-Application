@@ -5,10 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()  
 
-   
 def send_email(to_email, subject, body, html=False):
         email_user = os.getenv("EMAIL_USER")
         email_password = os.getenv("EMAIL_PASSWORD")
+
+        print("USER:", email_user)
+        print("PASSWORD:", email_password)
+
 
         if not email_user or not email_password:
             raise ValueError("EMAIL_USER or EMAIL_PASSWORD not found in environment variables")
@@ -22,8 +25,10 @@ def send_email(to_email, subject, body, html=False):
         msg['From'] = email_user
         msg['To'] = to_email
 
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=30) as server:
+            server.ehlo()
             server.starttls()
+            server.ehlo()
             server.login(msg['From'], email_password)
             server.send_message(msg)
         return

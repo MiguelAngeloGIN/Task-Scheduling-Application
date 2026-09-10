@@ -50,12 +50,17 @@ class ResetService:
         if not users:
             raise ValueError("Invalid or expired reset token.")
         user = users[0]
+
+        expiry = user.reset_token_expires_at
+
+        if expiry.tzinfo is None:
+            expiry = expiry.replace(tzinfo=timezone.utc)
         
         if not user.reset_token or not user.reset_token_expires_at:
             raise ValueError("No reset token found for this user")
 
 
-        if datetime.now(timezone.utc) > user.reset_token_expires_at:
+        if datetime.now(timezone.utc) > expiry:
             query_handling(Update_Sql.update_sql, models.User, user_id = user.user_id, reset_token = None, reset_token_expires_at = None)
             raise ValueError("Reset token has expired")
 
