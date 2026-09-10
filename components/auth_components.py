@@ -13,7 +13,7 @@ class Pages:
                                             href='/signup' if company_signup else '/admin-signup'),
 
                                        c.P('Please fill out the form below to sign up.'),
-                                       
+
                                        c.Form (
                                              c.Label('First Name: ', c.Input(type='text', name='first_name', value=first_name)),
                                              c.Br(),
@@ -63,27 +63,19 @@ class Pages:
                                    )
         
     @staticmethod
-    def paste_token_page(message=None, message_type=None, email=''):
-        return c.Titled('Paste Token',
-                                   c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P() ,
-                                   c.P('Please paste the token you received in your email.'),
-                                         c.Form(
-                                             c.Label('Token: ', c.Input(type='text', name='token')),
-                                             c.Input(type="hidden", name="email", value=email),
-                                             c.Br(),
-                                             c.Br(),
-                                             c.Button('Submit Token', type='submit'),
-                                                method='POST', action='/paste-token'))
-                                   )
+    def invalid_token_page(message=None, message_type=None):
+        return c.Titled('Invalid Reset Token',
+                        c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P()),
+                        c.A("Request a new reset link", href="/reset-password")
+                       )
 
     @staticmethod
-    def new_password_page(message=None, message_type=None, email='', token=''):
+    def new_password_page(message=None, message_type=None, token=''):
         return c.Titled('New Password',
                                    c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P() ,
                                    c.P('Please enter your new password.'),
                                          c.Form(
                                              c.Label('New Password: ', c.Input(type='password', name='new_password')),
-                                             c.Input(type="hidden", name="email", value=email),
                                              c.Input(type="hidden", name="token", value=token),
                                              c.Br(),
                                              c.Br(),

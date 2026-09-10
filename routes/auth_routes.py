@@ -1,4 +1,5 @@
 from services.user_service import UserService
+from services.password_reset_service import ResetService
 from typing import Optional
 from components.auth_components import Pages
 from fasthtml import common as c
@@ -98,41 +99,32 @@ def post_logout():
     return response
 
 
-# @rt('/reset-password', methods = ['GET'])
-# def get_password_reset():
-#     return Pages.reset_password_page()
+@rt('/reset-password', methods = ['GET'])
+def get_password_reset():
+    return Pages.reset_password_page()
 
-# @rt('/reset-password', methods = ['POST'])
-# def post_password_reset(email: str):
-#     try:
-#         UserService().create_reset_token(email=email)
-#         return c.RedirectResponse(f'/paste-token?email={email}&message=Password reset token created and sent to your email&message_type=success', status_code=302)
-#     except ValueError as e:
-#         return Pages.reset_password_page(message=str(e), message_type="error")
-
-
-# @rt('/paste-token', methods = ['GET'])
-# def get_paste_token( message: Optional[str] = None, message_type: Optional[str] = None, email: str = ''):
-#     return Pages.paste_token_page(email=email, message=message, message_type=message_type)
+@rt('/reset-password', methods = ['POST'])
+def post_password_reset(email: str):
+    try:
+        ResetService().create_reset_link(email=email)
+        return c.RedirectResponse(f'/paste-token?email={email}&message=Password reset token created and sent to your email&message_type=success', status_code=302)
+    except ValueError as e:
+        return Pages.reset_password_page(message=str(e), message_type="error")
 
 
-# @rt('/paste-token', methods = ['POST'])
-# def post_paste_token(email: str, token: str):
-#     try:
-#         UserService().verify_reset_token(email=email, token=token)
-#         return c.RedirectResponse(f'/new-password?email={email}&token={token}&message=Password reset token verified&message_type=success', status_code=302)
-#     except ValueError as e:
-#         return Pages.paste_token_page(email=email, message=str(e), message_type="error")
+@rt('/new-password', methods = ['GET'])
+def get_new_password(message: Optional[str] = None, message_type: Optional[str] = None, token: str = ''):
+    try:
+        ResetService.verify_reset_token(token=token)
+        return Pages.new_password_page(message=message, message_type=message_type, token=token)
+    except ValueError as e:
+        return Pages.invalid_token_page(message=str(e), message_type="error")
 
-# @rt('/new-password', methods = ['GET'])
-# def get_new_password(message: Optional[str] = None, message_type: Optional[str] = None, email: str = '', token: str = ''):
-#     return Pages.new_password_page(message=message, message_type=message_type, email=email, token=token)
-
-# @rt('/new-password', methods = ['POST'])
-# def post_new_password(email: str, token: str, new_password: str):
-#     try:
-#         UserService().reset_password(email=email, token=token, new_password=new_password)
-#         return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
-#     except ValueError as e:
-#         return Pages.new_password_page(message=str(e), message_type="error", email=email, token=token)
+@rt('/new-password', methods = ['POST'])
+def post_new_password(token: str, new_password: str):
+    try:
+        ResetService().reset_password(token=token, new_password=new_password)
+        return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
+    except ValueError as e:
+        return Pages.invalid_token_page(message=str(e), message_type="error")
 

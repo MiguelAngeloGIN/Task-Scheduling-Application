@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()  
 
    
-def send_email(to_email, subject, body):
+def send_email(to_email, subject, body, html=False):
         email_user = os.getenv("EMAIL_USER")
         email_password = os.getenv("EMAIL_PASSWORD")
 
@@ -14,7 +14,10 @@ def send_email(to_email, subject, body):
             raise ValueError("EMAIL_USER or EMAIL_PASSWORD not found in environment variables")
 
         msg = EmailMessage()
-        msg.set_content(body)
+        if html:
+            msg.add_alternative(body, subtype='html')
+        else:
+            msg.set_content(body)
         msg['Subject'] = subject
         msg['From'] = email_user
         msg['To'] = to_email
