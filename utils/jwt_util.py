@@ -1,6 +1,6 @@
 import jwt, os
 from dotenv import load_dotenv
-
+from typing import Optional
 
 load_dotenv() 
 secret_key = os.getenv("JWT_SECRET_KEY")
@@ -28,3 +28,19 @@ class JWTUtils:
 
 
     
+    @staticmethod
+    def verify_jwt(token: Optional[str]):
+        if not token:
+            raise ValueError("User not authenticated.")
+        payload = JWTUtils.decode_jwt(token)
+        return payload
+
+    @staticmethod
+    def verify_admin(request):
+        token = request.cookies.get("jwt_token")
+        payload = JWTUtils.verify_jwt(token)
+
+        if not payload.get("admin"):
+            raise ValueError("Admin access required.")
+
+        return payload

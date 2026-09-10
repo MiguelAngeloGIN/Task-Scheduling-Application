@@ -13,10 +13,13 @@ from utils.email_util import send_email
 class AdminService:
 
     @staticmethod
-    def create_company(name):
+    def create_company(name, user_id):
         InputValidator.validate_name(name)
+        InputValidator.validate_id(user_id)
 
-        return query_handling(Add_Sql.add_company, name=name, error="Company name already exists.")
+        company =query_handling(Add_Sql.add_company, name=name, error="Company name already exists.")
+        AdminService.add_user_to_company(user_id=user_id, company_id=company.company_id)
+        return company
 
    
     @staticmethod

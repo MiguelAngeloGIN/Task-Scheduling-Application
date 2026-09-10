@@ -40,7 +40,7 @@ def get_admin_signup():
 def post_company_signup(first_name: str, last_name: str,
                         email: str, password: str):
     try:
-        UserService.sign_up(
+        user = UserService.sign_up(
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -48,10 +48,11 @@ def post_company_signup(first_name: str, last_name: str,
             is_admin=True
         )
 
-        return c.RedirectResponse(
-            '/create-company',
-            status_code=302
-        )
+        token = UserService.generate_jwt(user)
+
+        response = c.RedirectResponse( '/create-company', status_code=302)
+        response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
+        return response
 
     except ValueError as e:
         return Pages.signup_page(action='/company-signup',

@@ -38,10 +38,22 @@ class UserService:
 
         password_hash = UserService.ph.hash(password)
        
-        return query_handling(Add_Sql.add_user, first_name, last_name, email, password_hash, is_admin,
+        return query_handling(Add_Sql.add_user, first_name = first_name, last_name=last_name, email=email, password_hash=password_hash, is_admin=is_admin,
                               error="User with this email already exists.")
 
 
+    @staticmethod
+    def generate_jwt(user):
+        payload = {
+            "sub": str(user.user_id),
+            "email": user.email,
+            "exp": datetime.now(timezone.utc) + timedelta(hours=24),  
+            "iat": datetime.now(timezone.utc),
+            "admin" : user.is_admin,
+            "team_leader": user.is_team_leader
+        }
+        return JWTUtils.generate_jwt(payload)
+    
     @staticmethod
     def login(email, password):
         email = InputValidator.validate_email(email)
@@ -55,17 +67,7 @@ class UserService:
         except VerifyMismatchError:
             raise ValueError("Incorrect email or password!")
 
-        payload = {
-            "sub": str(user.user_id),
-            "email": user.email,
-            "exp": datetime.now(timezone.utc) + timedelta(hours=24),  
-            "iat": datetime.now(timezone.utc),
-            "admin" : user.is_admin,
-            "team_leader": user.is_team_leader
-        }
-
-        token = JWTUtils.generate_jwt(payload)
-        print(f"User {user.user_id} logged in. JWT token generated.")
+        token = UserService.generate_jwt(user)
         return token
 
         
