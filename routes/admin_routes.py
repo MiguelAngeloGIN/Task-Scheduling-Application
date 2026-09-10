@@ -41,5 +41,10 @@ def post_create_company(request, name: str):
 
 @rt('/admin-dashboard', methods=['GET'])
 def get_admin_dashboard(request):
-    pass
+    try:
+        JWTUtils.verify_admin(request)
+    
+        return Pages.admin_dashboard_page(message=f'Welcome', message_type='success')
+    except ValueError as e:
+        return c.RedirectResponse(f'/login?message={str(e)}&message_type=error', status_code=302)
 
