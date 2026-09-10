@@ -4,6 +4,7 @@ from typing import Optional
 from components.auth_components import Pages
 from fasthtml import common as c
 from core.app import rt
+from utils.jwt_util import JWTUtils
 
 
 @rt('/signup', methods=['GET'])
@@ -79,7 +80,14 @@ def post_login(email: str, password: str):
     try:
         token = UserService().login(email=email, password=password)
 
-        response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
+        payload = JWTUtils.decode_jwt(token)
+
+        if payload['admin']:
+            response = c.RedirectResponse('/admin-dashboard?message=Logged in successfully&message_type=success', status_code=302)
+
+        else:
+            response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
+            
         response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
         ## secure = False to allow testing on localhost, should be True in production with HTTPS
         return response
