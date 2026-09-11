@@ -1,6 +1,7 @@
 from crud.get_crud import Get_Sql
 from crud.update_crud import Update_Sql
 from crud.add_crud import Add_Sql
+from crud.delete_crud import Delete_Sql
 from database import models
 from utils.query_util import query_handling
 import secrets
@@ -74,6 +75,9 @@ class CompanyService:
             if expiry > datetime.now(timezone.utc):
                 raise ValueError("This user is already invited to this company.")
 
+            if expiry <= datetime.now(timezone.utc):
+                query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=existing_invitation[0].token)
+
         token = secrets.token_urlsafe(32)
 
         expiration_time = (
@@ -84,7 +88,7 @@ class CompanyService:
             f"http://localhost:5001/accept-invitation?token={token}"
         )
 
-        query_handling(Add_Sql.add_invitation, company_id=company_id, user_id=invited_user.user_id, invited_by=invited_by,
+        query_handling(Add_Sql.add_invitation, company_id=company_id, invited_email=invited_user.email, invited_by=invited_by,
                         token=token, expires_at=expiration_time, error="Failed to create invitation.")
 
         EmailService.send_invitation_email(invited_email=invited_user.email, invitation_link=invitation_link, company_name=company[0].name)
@@ -93,7 +97,7 @@ class CompanyService:
 
 
     @staticmethod
-    def add_user_to_company(user_id, company_id):
+    def add_user_to_company(user_id, company_id, token=None):
         InputValidator.validate_id(user_id)
         InputValidator.validate_id(company_id)
 
@@ -112,7 +116,10 @@ class CompanyService:
         if user.company_id is not None:
             raise ValueError("User already belongs to a company.")
 
-        return query_handling(Update_Sql.update_sql, model=models.User, user_id=user.user_id, company_id=company_id)
+        query_handling(Update_Sql.update_sql, model=models.User, user_id=user.user_id, company_id=company_id)
+
+        if token:
+            return query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=token)
 
     @staticmethod
     def remove_user_from_company(user_id):
@@ -136,8 +143,6 @@ class CompanyService:
             raise ValueError("Company does not exist.")
 
         return company[0]
-
-
 
 
     @staticmethod

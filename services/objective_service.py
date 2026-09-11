@@ -11,4 +11,15 @@ from services.email_service import EmailService
 
 class ObjectiveService:
 
-    def create_objective(title: str, description: str, company_id: int):
+    @staticmethod
+    def create_objective(name, company_id, description):
+        InputValidator.validate_name(name)
+        InputValidator.validate_id(company_id)
+
+        company = Get_Sql.get_sql(models.Company, company_id=company_id)
+        if not company:
+            raise ValueError("Company is not registered.")
+        company = company[0]
+
+        objective = query_handling(Add_Sql.add_objective, name=name, company_id=company_id, description=description, error="Objective name already exists.")
+        return objective
