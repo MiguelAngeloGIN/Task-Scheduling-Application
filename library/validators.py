@@ -28,7 +28,19 @@ class InputValidator:
             raise ValueError("Description must be at most 500 characters long.")
 
         return data
+
+    
+    @staticmethod
+    def validate_str(data):
+        if not isinstance(data, str):
+            raise ValueError("Input data must be a string.")
         
+        data = data.strip()
+
+        if len(data) == 0:
+            raise ValueError("Input data cannot be empty.")
+
+        return data
 
     @staticmethod
     def validate_email(data):

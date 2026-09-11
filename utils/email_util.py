@@ -9,10 +9,6 @@ def send_email(to_email, subject, body, html=False):
         email_user = os.getenv("EMAIL_USER")
         email_password = os.getenv("EMAIL_PASSWORD")
 
-        print("USER:", email_user)
-        print("PASSWORD:", email_password)
-
-
         if not email_user or not email_password:
             raise ValueError("EMAIL_USER or EMAIL_PASSWORD not found in environment variables")
 

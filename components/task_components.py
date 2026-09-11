@@ -1,5 +1,5 @@
 from fasthtml import common as c
-from components.search_component import TaskSearch
+from components.search_component import AutoSearch
 
 class Pages:
     @staticmethod
@@ -105,9 +105,12 @@ class Pages:
                         value=",".join(dependencies) if dependencies else ""
                 ),
 
-                TaskSearch.render(
+                AutoSearch.render(
                     form_id='task-form',
-                    hidden_input_id='dependencies'
+                    hidden_input_id='dependencies',
+                    entity='task',
+                    search_id='dependencies',
+                    mode='select'
                 ),
 
                 c.Button(button_text, type='submit', onclick="return confirm('Are you sure you want to save these changes?')" if task_id else None),
@@ -196,10 +199,13 @@ class Pages:
                     id=hidden_input_id
                 ),
 
-                TaskSearch.render(
+                AutoSearch.render(
                     form_id=form_id,
                     hidden_input_id=hidden_input_id,
-                    mode=mode
+                    mode=mode,
+                    entity='task',
+                    search_id= 'dependencies' 
+
                 ),
 
                 c.Button(button_text, type='submit', onclick=onclick if onclick else None),

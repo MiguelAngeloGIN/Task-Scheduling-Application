@@ -60,7 +60,7 @@ class Objective(Base):
     __tablename__ = "Objective"
 
     objective_id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     description = Column(String(500))
     progress = Column(Numeric(5, 2), default=0)
     company_id = Column(Integer, ForeignKey("Company.company_id"))

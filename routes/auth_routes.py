@@ -1,5 +1,4 @@
-from services.user_service import UserService
-from services.password_reset_service import ResetService
+from services.auth_service import AuthService
 from typing import Optional
 from components.auth_components import Pages
 from fasthtml import common as c
@@ -16,7 +15,7 @@ def get_signup():
 def post_signup(first_name: str, last_name: str, email: str, password: str):
    
     try:
-        UserService().sign_up(
+        AuthService().sign_up(
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -42,7 +41,7 @@ def get_admin_signup():
 def post_company_signup(first_name: str, last_name: str,
                         email: str, password: str):
     try:
-        user = UserService.sign_up(
+        user = AuthService.sign_up(
             first_name=first_name,
             last_name=last_name,
             email=email,
@@ -50,7 +49,7 @@ def post_company_signup(first_name: str, last_name: str,
             is_admin=True
         )
 
-        token = UserService.generate_jwt(user)
+        token = AuthService.generate_jwt(user)
 
         response = c.RedirectResponse( '/create-company', status_code=302)
         response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
@@ -78,7 +77,7 @@ def get_login(message: Optional[str] = None, message_type: Optional[str] = None)
 @rt('/login', methods=['POST'])
 def post_login(email: str, password: str):
     try:
-        token = UserService().login(email=email, password=password)
+        token = AuthService.login(email=email, password=password)
 
         payload = JWTUtils.decode_jwt(token)
 
@@ -114,7 +113,7 @@ def get_password_reset():
 @rt('/reset-password', methods = ['POST'])
 def post_password_reset(email: str):
     try:
-        ResetService().create_reset_link(email=email)
+        AuthService.create_password_reset(email=email)
         return Pages.reset_email_sent_page()
     except ValueError as e:
         return Pages.reset_password_page(message=str(e), message_type="error")
@@ -123,7 +122,7 @@ def post_password_reset(email: str):
 @rt('/new-password', methods = ['GET'])
 def get_new_password(message: Optional[str] = None, message_type: Optional[str] = None, token: str = ''):
     try:
-        ResetService.verify_reset_token(token=token)
+        AuthService.verify_reset_token(token=token)
         return Pages.new_password_page(message=message, message_type=message_type, token=token)
     except ValueError as e:
         return Pages.invalid_token_page(message=str(e), message_type="error")
@@ -134,7 +133,7 @@ def post_new_password(token: str, new_password: str, confirm_password: str):
         if new_password != confirm_password:
             raise ValueError("The passwords do not match.")
 
-        ResetService().reset_password(token=token, new_password=new_password)
+        AuthService.reset_password(token=token, new_password=new_password)
         return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
     except ValueError as e:
         if "token" in str(e).lower():

@@ -1,127 +1,145 @@
 from fasthtml import common as c
 
 
-class TaskSearch:
+class AutoSearch:
+
     @staticmethod
-    def search_bar():
+    def search_bar(search_id):
         return c.Div(
             c.Label(
                 'Search: ',
                 c.Input(
                     type='search',
-                    id='search',
-                    placeholder='Search for tasks'
+                    id=search_id,
+                    placeholder='Search'
                 )
             )
         )
 
     @staticmethod
-    def dropdown():
+    def dropdown(search_id):
         return c.Div(
-            c.Ul(id='search-results'),
-            c.Div(id='selected-tasks')
+            c.Ul(id=f'{search_id}-results'),
+            c.Div(id=f'{search_id}-selected')
         )
 
     @staticmethod
-    def auto_search(form_id, hidden_input_id, mode = "select"):
+    def auto_search(form_id, hidden_input_id, entity, search_id, mode="select"):
+
         script = """
         document.addEventListener("DOMContentLoaded", () => {
-        console.log("SEARCH SCRIPT LOADED");
 
-        let selected_storage = new Map(); 
+            let selected_storage = new Map();
 
-        document.getElementById('search').addEventListener('input', async e => {
+            let search = document.getElementById('{search_id}');
+            let results = document.getElementById('{search_id}-results');
+            let selected = document.getElementById('{search_id}-selected');
 
-            let query = e.target.value;
-            let results = document.getElementById('search-results');
+            search.addEventListener('input', async e => {
 
-            if (query.length === 0) {
+                let query = e.target.value;
+
+                if (query.length === 0) {
+                    results.innerHTML = "";
+                    return;
+                }
+
+                let response = await fetch(`/search-{entity}?query=${encodeURIComponent(query)}`);
+                let results_data = await response.json();
+
                 results.innerHTML = "";
-                return;
-            }
 
-            let response = await fetch(`/search-tasks?query=${encodeURIComponent(query)}`);
-            let tasks = await response.json();
+                results_data.forEach(result => {
 
-            results.innerHTML = "";
+                    let option = document.createElement("li");
+                    let button = document.createElement("button");
 
-            tasks.forEach(task => {
+                    button.textContent = result.name;
+                    button.type = "button";
 
-                let option = document.createElement("li");
-                let button = document.createElement("button");
+                    button.onclick = () => {
 
-                button.textContent = task.title;
-                button.type = "button";
+                        if ("{mode}" === "redirect") {
 
-                button.onclick = () => {
-                    if ("{mode}" === "redirect") {
+                            window.location.href = `/update-{entity}/${result.id}`;
 
-                    window.location.href = `/update-task/${task.id}`;
+                        } else {
 
-                    } else {
+                            if (!selected_storage.has(result.id)) {
 
-                    let selected = document.getElementById('selected-tasks');
+                                selected_storage.set(result.id, {
+                                    id: result.id,
+                                    name: result.name
+                                });
 
-                    if (!selected_storage.has(task.id)) {
 
-                        selected_storage.set(task.id, {
-                            id: task.id,
-                            title: task.title
-                        });
+                                let chip = document.createElement("button");
 
-                        let chip = document.createElement("button");
+                                chip.textContent = result.name;
+                                chip.className = "chip";
+                                chip.type = "button";
+                                chip.title = "Click to remove";
 
-                        chip.textContent = task.title;
-                        chip.className = "chip";
-                        chip.type = "button";
-                        chip.title = "Click to remove";
 
-                        chip.onclick = () => {
-                            selected_storage.delete(task.id);
-                            selected.removeChild(chip);
-                        };
+                                chip.onclick = () => {
+                                    selected_storage.delete(result.id);
+                                    selected.removeChild(chip);
+                                };
 
-                        selected.appendChild(chip);
-                    }
-                    
-                    }
-                };
 
-                option.appendChild(button);
-                results.appendChild(option);
+                                selected.appendChild(chip);
+                            }
+                        }
+                    };
+
+
+                    option.appendChild(button);
+                    results.appendChild(option);
+
+                });
 
             });
 
+
+            if ("{mode}" === "select") {
+
+                document.querySelector('#{form_id}')
+                .addEventListener('submit', e => {
+
+                    let hiddenInput = document.querySelector('#{hidden_input_id}');
+
+                    let selected_ids = Array.from(selected_storage.values())
+                        .map(result => result.id);
+
+
+                    hiddenInput.value = JSON.stringify(selected_ids);
+
+                });
+            }
+
         });
-
-         if ("{mode}" === "select") {
-        document.querySelector('#{form_id}').addEventListener('submit', e => {
-
-            let hiddenInput = document.querySelector('input[id="{hidden_input_id}"]');
-
-            let selected_ids = Array.from(selected_storage.values())
-                .map(task => task.id);
-
-            hiddenInput.value = JSON.stringify(selected_ids);
-
-        });
-        }
-
-    });
-    """
+        """
 
         script = script.replace("{form_id}", form_id)
         script = script.replace("{hidden_input_id}", hidden_input_id)
         script = script.replace("{mode}", mode)
+        script = script.replace("{entity}", entity)
+        script = script.replace("{search_id}", search_id)
 
         return c.Script(script)
-        
 
 
     @staticmethod
-    def render(form_id, hidden_input_id, mode = "select"):
+    def render(form_id, hidden_input_id, entity, search_id, mode="select"):
+
         return c.Div(
-            TaskSearch.search_bar(),
-            TaskSearch.dropdown(),
-            TaskSearch.auto_search(form_id, hidden_input_id, mode)
+            AutoSearch.search_bar(search_id),
+            AutoSearch.dropdown(search_id),
+            AutoSearch.auto_search(
+                form_id,
+                hidden_input_id,
+                entity,
+                search_id,
+                mode
+            )
         )
