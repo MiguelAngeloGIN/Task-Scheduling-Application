@@ -139,7 +139,9 @@ class TeamService:
             raise ValueError("User and team do not belong to the same company.")
 
         if user.team_id != team_id:
-            raise ValueError("User must be a member of the team before becoming leader.")
+            raise ValueError("User is not a member of this team.")
+        
+        if team.leader_id != user_id:
+            raise ValueError("User is not the leader of this team.")
 
-        return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id, 
-                              team_id=None, is_team_leader=False)
+        return query_handling(Update_Sql.update_sql, model=models.Team, team_id=team_id, leader_id=None)

@@ -116,7 +116,6 @@ def get_accept_invitation(request, token: str, message: Optional[str] = "", mess
 def get_create_team(request, message: Optional[str] = None, message_type: Optional[str] = None):
         return Pages.create_team_page(message=message, message_type=message_type)
 
-
 @rt('/create-team', methods=['POST'])
 @admin_required
 def post_create_team(request, team_name: str):
@@ -200,6 +199,7 @@ def get_assign_team_leader(request, message: Optional[str] = None, message_type:
 @rt('/assign-team-leader', methods=['POST'])
 @admin_required
 def post_assign_team_leader(request, user_id: str, team_id: str):
+        
         try:
             admin_payload = request.state.admin_payload
             admin = QueryService.get_user(int(admin_payload['sub']))
@@ -231,3 +231,45 @@ def post_assign_team_leader(request, user_id: str, team_id: str):
                                         warning = 'If the team already has a leader he will be replaced',
                                         title='Assign Team Leader', action='/assign-team-leader', user_mode='select_one'
                                         )
+
+
+@rt('/remove-team-leader', methods=['GET'])
+@admin_required
+def get_remove_team_leader(request, message: Optional[str] = None, message_type: Optional[str] = None):
+    return Pages.user_team_page(message=message, message_type=message_type, 
+                                warning = 'After removing the team leader you will be required to assign a new leader',
+                                title='Remove Team Leader', action='/remove-team-leader', user_mode='select_one'
+                                )
+
+@rt('/remove-team-leader', methods=['POST'])
+@admin_required
+def post_remove_team_leader(request, user_id: str, team_id: str):
+    try:
+        admin_payload = request.state.admin_payload
+        admin = QueryService.get_user(int(admin_payload['sub']))
+        company_id = admin.company_id
+
+        if not user_id:
+            raise ValueError("Please select one user email from the dropdown")
+
+        if not team_id:
+            raise ValueError("Please select a team from the dropdown")
+
+        team_id_int = int(team_id)
+        user_id_int = int(user_id)
+
+        QueryService.get_company_team(team_id=team_id_int, company_id=company_id)
+        QueryService.get_company_user(user_id=user_id_int, company_id=company_id)
+
+
+        TeamService.remove_team_leader(team_id=team_id_int, user_id=user_id_int)
+
+        return Pages.user_team_page(message=f'Team leader removed successfully', message_type='success', 
+                                    warning = 'After removing the team leader you will be required to assign a new leader',
+                                    title='Remove Team Leader', action='/remove-team-leader', user_mode='select_one'
+                                    )
+    except ValueError as e:
+        return Pages.user_team_page(message=f'Failed to remove team leader: {str(e)}', message_type='error',
+                                    warning = 'After removing the team leader you will be required to assign a new leader',
+                                    title='Remove Team Leader', action='/remove-team-leader', user_mode='select_one'
+                                    )
