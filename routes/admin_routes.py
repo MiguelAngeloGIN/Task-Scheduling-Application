@@ -130,19 +130,19 @@ def post_create_team(request, team_name: str):
 
 
 
-@rt('/delete-team', methods=['GET'])
+@rt('/deactivate-team', methods=['GET'])
 @admin_required
-def get_delete_team(request, message: Optional[str] = None, message_type: Optional[str] = None):
-        return Pages.delete_team_page(message=message, message_type=message_type)
+def get_deactivate_team(request, message: Optional[str] = None, message_type: Optional[str] = None):
+        return Pages.deactivate_team_page(message=message, message_type=message_type)
 
-@rt('/delete-team', methods=['POST'])
+@rt('/deactivate-team', methods=['POST'])
 @admin_required
-def post_delete_team(request, team_id: str):
+def post_deactivate_team(request, team_id: str):
         try:
-            TeamService.delete_team(team_id=int(team_id))
-            return c.RedirectResponse(f'/admin-dashboard?message=Team deleted successfully&message_type=success', status_code=302)
+            TeamService.deactivate_team(team_id=int(team_id))
+            return c.RedirectResponse(f'/admin-dashboard?message=Team deactivated successfully&message_type=success', status_code=302)
         except ValueError as e:
-            return Pages.delete_team_page(message=f'Failed to delete team: {str(e)}', message_type='error')
+            return Pages.deactivate_team_page(message=f'Failed to deactivate team: {str(e)}', message_type='error')
 
 
 @rt('/add-to-team', methods=['GET'])
@@ -202,28 +202,27 @@ def get_assign_team_leader(request, message: Optional[str] = None, message_type:
 def post_assign_team_leader(request, user_id: str, team_id: str):
         try:
             admin_payload = request.state.admin_payload
-            company_id=QueryService.get_user(user_id=int(admin_payload['sub'])).company_id
-            user_ids = parse_json_input(user_id)
+            admin = QueryService.get_user(int(admin_payload['sub']))
+            company_id = admin.company_id
 
-            if not user_ids:
+            if not user_id:
                 raise ValueError("Please select one user email from the dropdown")
 
             if not team_id:
                 raise ValueError("Please select a team from the dropdown")
 
-            team = QueryService.get_company_team(team_id=int(team_id), company_id=company_id)
+            team_id_int = int(team_id)
 
-            for selected_user_id in user_ids:
+            user_id_int = int(user_id)
 
-                 if not selected_user_id:
-                     raise ValueError("Please select at least one user email from the dropdown")
-                 
-                 user = QueryService.get_company_user(user_id=int(selected_user_id), company_id=company_id)
-           
-                 TeamService.assign_team_leader(team_id=int(team.team_id), user_id=int(user.user_id))
+            QueryService.get_company_team(team_id=team_id_int, company_id=company_id)
+
+            QueryService.get_company_user(user_id=user_id_int, company_id=company_id)
+
+            TeamService.assign_team_leader(team_id=team_id_int, user_id=user_id_int)
 
         
-            return Pages.user_team_page(message=f'Users assigned as team leader successfully', message_type='success', 
+            return Pages.user_team_page(message=f'User assigned as team leader successfully', message_type='success', 
                                         warning = 'If the team already has a leader he will be replaced',
                                         title='Assign Team Leader', action='/assign-team-leader', user_mode='select_one'
                                         )

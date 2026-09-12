@@ -121,14 +121,16 @@ class QueryService:
 
 
     @staticmethod
-    def search_user(query):
+    def search_user(query, company_id):
         InputValidator.validate_str(query)
+        InputValidator.validate_id(company_id)
 
-        return Get_Sql.search_sql(models.User, query, "email")
+        return Get_Sql.search_by_company_sql(models.User, company_id, query, "email")
     
     @staticmethod
-    def search_team(query):
+    def search_team(query, company_id):
         InputValidator.validate_str(query)
+        InputValidator.validate_id(company_id)
 
-        return Get_Sql.search_sql(models.Team, query, "name")
+        return Get_Sql.search_by_company_sql(models.Team, company_id, query, "name")
     

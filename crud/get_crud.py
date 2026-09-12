@@ -16,11 +16,12 @@ class Get_Sql:
         return results
         
     @staticmethod
-    def search_sql(model, query, attribute):
+    def search_by_company_sql(model, company_id, query, attribute):
         if not hasattr(model, attribute):
             raise ValueError(f"{model.__name__} has no attribute '{attribute}'.")
 
         return session.query(model).filter(
+            getattr(model, "company_id") == company_id,
             getattr(model, attribute).like(f"%{query}%")
         ).all()
 

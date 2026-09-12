@@ -22,13 +22,14 @@ class TeamService:
         if not company:
             raise ValueError("Company does not exist.")
 
+
         return query_handling(Add_Sql.add_team, team_name, company_id,
                               error="Team with this name already exists."
                               )
 
     @staticmethod
     @transaction
-    def delete_team(team_id):
+    def deactivate_team(team_id):
         InputValidator.validate_id(team_id)
 
         team = Get_Sql.get_sql(models.Team, team_id=team_id
@@ -36,7 +37,7 @@ class TeamService:
         if not team:
             raise ValueError("Team does not exist.")
 
-        return query_handling(Delete_Sql.delete_sql, model=models.Team, team_id=team_id
+        return query_handling(Update_Sql.update_sql, model=models.Team, team_id=team_id, is_active=False
                               )
 
     @staticmethod
@@ -113,8 +114,8 @@ class TeamService:
                 "User and team do not belong to the same company."
             )
 
-        return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id,
-                              team_id=team_id, is_team_leader=True)
+        return query_handling(Update_Sql.update_sql, model=models.Team, team_id=team_id, leader_id=user_id)
+    
 
     @staticmethod
     @transaction
@@ -136,6 +137,9 @@ class TeamService:
 
         if user.company_id != team.company_id:
             raise ValueError("User and team do not belong to the same company.")
+
+        if user.team_id != team_id:
+            raise ValueError("User must be a member of the team before becoming leader.")
 
         return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id, 
                               team_id=None, is_team_leader=False)

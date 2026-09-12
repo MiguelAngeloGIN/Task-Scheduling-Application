@@ -25,7 +25,7 @@ class Pages:
                         c.P('Welcome to your dashboard!'),
                         c.Div(c.Form(c.Button('INVITE TO COMPANY', type = "submit"), method='GET', action='/invite-to-company')),
                         c.Div(c.Form(c.Button('CREATE TEAM', type='submit'), method='GET', action='/create-team')),
-                        c.Div(c.Form(c.Button('DELETE TEAM', type = "submit"), method='GET', action='/delete-team')),
+                        c.Div(c.Form(c.Button('DEACTIVATE TEAM', type = "submit"), method='GET', action='/deactivate-team')),
                         c.Div(c.Form(c.Button('ADD TO TEAM', type = "submit"), method='GET', action='/add-to-team')),
                         c.Div(c.Form(c.Button('REMOVE FROM TEAM', type = "submit"), method='GET', action='/remove-from-team')),
                         c.Div(c.Form(c.Button('ASSIGN TEAM LEADER', type = "submit"), method='GET', action='/assign-team-leader')),
@@ -77,14 +77,14 @@ class Pages:
         )
 
     @staticmethod
-    def delete_team_page(message=None, message_type=None, team_name=''):
+    def deactivate_team_page(message=None, message_type=None, team_name=''):
         return Pages.single_field_form(
             message=message,
             message_type=message_type,
-            title='Delete Team',
-            action='/delete-team',
+            title='Deactivate Team',
+            action='/deactivate-team',
             value=team_name,
-            button='Delete Team',
+            button='Deactivate Team',
             label='Team Name'
         )
 
