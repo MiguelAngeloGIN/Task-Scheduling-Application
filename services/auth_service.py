@@ -10,13 +10,15 @@ from datetime import datetime, timezone, timedelta
 from utils.jwt_util import JWTUtils
 from utils.query_util import query_handling
 from database import models
-
+from utils.decorators_util import transaction
 
 
 class AuthService:
     ph = PasswordHasher()
 
+    
     @staticmethod
+    @transaction
     def sign_up(first_name, last_name, email, password, is_admin=False):
        
         first_name = InputValidator.validate_name(first_name)
@@ -38,9 +40,10 @@ class AuthService:
             "exp": datetime.now(timezone.utc) + timedelta(hours=24),  
             "iat": datetime.now(timezone.utc),
             "admin" : user.is_admin,
-            "team_leader": user.is_team_leader
         }
         return JWTUtils.generate_jwt(payload)
+
+    
     
     @staticmethod
     def login(email, password):
@@ -61,6 +64,7 @@ class AuthService:
 
 
     @staticmethod
+    @transaction
     def create_password_reset(email):
         email = InputValidator.validate_email(email)
         users = Get_Sql.get_sql(models.User, email = email)
@@ -107,6 +111,7 @@ class AuthService:
     
     
     @staticmethod
+    @transaction
     def reset_password(token, new_password):
         token = InputValidator.validate_str(token)
         user = AuthService.verify_reset_token(token)

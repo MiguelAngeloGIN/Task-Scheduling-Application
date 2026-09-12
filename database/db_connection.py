@@ -12,4 +12,6 @@ engine = create_engine(f"mysql+pymysql://{user}:{password}@localhost/{database}"
 
 Session = sessionmaker(bind=engine)
 
+
+
 print("✅ Connected!")

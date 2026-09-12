@@ -5,12 +5,14 @@ from crud.add_crud import Add_Sql
 from database import models
 from utils.query_util import query_handling
 from library.validators import InputValidator
+from utils.decorators_util import transaction
 
 
 
 class TeamService:
-
+    
     @staticmethod
+    @transaction
     def create_team(team_name, company_id):
         InputValidator.validate_name(team_name)
         InputValidator.validate_id(company_id)
@@ -25,6 +27,7 @@ class TeamService:
                               )
 
     @staticmethod
+    @transaction
     def delete_team(team_id):
         InputValidator.validate_id(team_id)
 
@@ -37,6 +40,7 @@ class TeamService:
                               )
 
     @staticmethod
+    @transaction
     def add_user_to_team(user_id, team_id):
         InputValidator.validate_id(user_id)
         InputValidator.validate_id(team_id)
@@ -53,6 +57,9 @@ class TeamService:
         if not team:
             raise ValueError("Team does not exist.")
 
+        if user.team_id == team_id:
+            raise ValueError("User is already a member of this team.")
+
         team = team[0]
 
         if user.company_id != team.company_id:
@@ -65,6 +72,7 @@ class TeamService:
                               )
 
     @staticmethod
+    @transaction
     def remove_user_from_team(user_id):
         InputValidator.validate_id(user_id)
 
@@ -81,6 +89,7 @@ class TeamService:
 
 
     @staticmethod
+    @transaction
     def assign_team_leader(user_id, team_id):
         InputValidator.validate_id(user_id)
         InputValidator.validate_id(team_id)
@@ -108,6 +117,7 @@ class TeamService:
                               team_id=team_id, is_team_leader=True)
 
     @staticmethod
+    @transaction
     def remove_team_leader(user_id, team_id):
         InputValidator.validate_id(user_id)
         InputValidator.validate_id(team_id)

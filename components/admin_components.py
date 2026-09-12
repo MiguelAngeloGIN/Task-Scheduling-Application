@@ -35,21 +35,21 @@ class Pages:
 
     @staticmethod
     def single_field_form(message=None, message_type=None, title ='', action = '', value='', button = '', label = '', input_type='text'):
-        return c.Titled(title,
-                        c.Div(
-                            c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
-                            c.Form(
-                                c.Label(f'{label}: ', c.Input(type=input_type, name=label.lower().replace(' ', '_'), value=value)),
-                                c.Br(),
-                                c.Br(),
-                                c.Button(button, type='submit'),
-                                c.Br(),
-                                c.Br(),
-                                c.A('Back to dashboard', href='/admin-dashboard'),
-                                method='POST', action=action
+            return c.Titled(title,
+                            c.Div(
+                                c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
+                                c.Form(
+                                    c.Label(f'{label}: ', c.Input(type=input_type, name=label.lower().replace(' ', '_'), value=value)),
+                                    c.Br(),
+                                    c.Br(),
+                                    c.Button(button, type='submit'),
+                                    c.Br(),
+                                    c.Br(),
+                                    c.A('Back to dashboard', href='/admin-dashboard'),
+                                    method='POST', action=action
+                                )
                             )
                         )
-                    )
 
     @staticmethod
     def invite_user_page(message=None, message_type=None, email=''):
@@ -92,12 +92,50 @@ class Pages:
     def accept_invite_page(message=None, message_type=None):
         return c.Div(
                     c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
-                    c.A("Request a new invitation", href="/invite-to-company")
+                    c.A("Dashboard", href="/dashboard")
                )
-                       
+
+
+    @staticmethod
+    def user_team_page(message=None, message_type=None, warning = None, title='', action='', user_mode = 'select', team_mode = 'select_one'):
+        return  c.Titled(title,
+            c.Div(
+                c.P(
+                message,
+                cls=message_type
+        ) if message else "",
+
+        c.P(warning, 
+            cls= 'warning') if warning else '',
+
+        c.Form(
+            AutoSearch.render(
+                form_id="add-team-form",
+                hidden_input_id="user_id",
+                entity="user",
+                search_id="user-search",
+                label='User email:',
+                mode = user_mode,
+            ),
+
+            AutoSearch.render(
+                 form_id="add-team-form",
+                 hidden_input_id="team_id",
+                 entity="team",
+                 search_id="team-search",
+                 label='Team:',
+                 mode = team_mode
+                   ),
+
+            c.Button("Add to Team", type="submit"),
+            c.A("Cancel", href="/admin-dashboard"),
+            id="add-team-form",
+            method="POST",
+            action=action
+        )
+        )
+        )
 
     
-    
-
     
     

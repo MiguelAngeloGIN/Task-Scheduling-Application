@@ -8,11 +8,10 @@ class Add_Sql:
     def add_company(name):
         new_company = models.Company(name=name)
         session.add(new_company)
-        session.commit()
         return new_company
 
     @staticmethod
-    def add_user(first_name, last_name, email, password_hash, reset_token=None, reset_token_expires_at=None, is_admin=False, is_team_leader=False):
+    def add_user(first_name, last_name, email, password_hash, reset_token=None, reset_token_expires_at=None, is_admin=False):
         new_user = models.User(
             first_name=first_name,
             last_name=last_name,
@@ -23,10 +22,8 @@ class Add_Sql:
             reset_token=reset_token,
             reset_token_expires_at=reset_token_expires_at,
             is_admin=is_admin,
-            is_team_leader=is_team_leader
         )
         session.add(new_user)
-        session.commit()
         print(f"User {new_user.user_id} added.")
         return new_user
 
@@ -37,7 +34,6 @@ class Add_Sql:
             company_id=company_id
         )
         session.add(new_team)
-        session.commit()
         print(f"Team {new_team.team_id} added.")
         return new_team
 
@@ -49,7 +45,6 @@ class Add_Sql:
             company_id=company_id
         )
         session.add(new_objective)
-        session.commit()
         print(f"Objective {new_objective.objective_id} added.")
         return new_objective
 
@@ -69,7 +64,6 @@ class Add_Sql:
             objective_id=objective_id
         )
         session.add(new_task)
-        session.commit()
         print(f"Task {new_task.task_id} added.")
         return new_task
 
@@ -80,7 +74,6 @@ class Add_Sql:
             dependency=dependency_id
         )
         session.add(new_dependency)
-        session.commit()
         print(f"Dependency {new_dependency.dependency_id} added.")
         return new_dependency
 
@@ -95,7 +88,6 @@ class Add_Sql:
             task=task_id
         )
         session.add(new_task_history)
-        session.commit()
         print(f"TaskHistory {new_task_history.task_history_id} added.")
         return new_task_history
 
@@ -110,7 +102,6 @@ class Add_Sql:
             expires_at=expires_at
         )
         session.add(new_invitation)
-        session.commit()
         print(f"Invitation {new_invitation.invitation_id} added.")
         return new_invitation
 

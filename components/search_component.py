@@ -4,10 +4,10 @@ from fasthtml import common as c
 class AutoSearch:
 
     @staticmethod
-    def search_bar(search_id):
+    def search_bar(search_id, label):
         return c.Div(
             c.Label(
-                'Search: ',
+                label,
                 c.Input(
                     type='search',
                     id=search_id,
@@ -63,33 +63,39 @@ class AutoSearch:
 
                             window.location.href = `/update-{entity}/${result.id}`;
 
-                        } else {
-
-                            if (!selected_storage.has(result.id)) {
-
-                                selected_storage.set(result.id, {
-                                    id: result.id,
-                                    name: result.name
-                                });
-
-
-                                let chip = document.createElement("button");
-
-                                chip.textContent = result.name;
-                                chip.className = "chip";
-                                chip.type = "button";
-                                chip.title = "Click to remove";
-
-
-                                chip.onclick = () => {
-                                    selected_storage.delete(result.id);
-                                    selected.removeChild(chip);
-                                };
-
-
-                                selected.appendChild(chip);
-                            }
+                        } 
+                        
+                        if ("{mode}" === "select_one") {
+                            selected_storage.clear();
+                            selected.innerHTML = "";
                         }
+                        
+                        
+
+                        if (!selected_storage.has(result.id)) {
+
+                            selected_storage.set(result.id, {
+                                id: result.id,
+                                name: result.name
+                            });
+
+
+                            let chip = document.createElement("button");
+
+                            chip.textContent = result.name;
+                            chip.className = "chip";
+                            chip.type = "button";
+                            chip.title = "Click to remove";
+
+
+                            chip.onclick = () => {
+                                selected_storage.delete(result.id);
+                                selected.removeChild(chip);
+                            };
+
+
+                            selected.appendChild(chip);
+                            }
                     };
 
 
@@ -115,7 +121,20 @@ class AutoSearch:
                     hiddenInput.value = JSON.stringify(selected_ids);
 
                 });
+
             }
+            if ("{mode}" === "select_one") {
+                document.querySelector('#{form_id}')
+                .addEventListener('submit', e => {
+                    let hiddenInput = document.querySelector('#{hidden_input_id}');
+                    let selected_id = Array.from(selected_storage.values())
+                        .map(result => result.id)[0];
+
+                    hiddenInput.value = selected_id || "";
+                });
+            
+            }
+
 
         });
         """
@@ -130,11 +149,14 @@ class AutoSearch:
 
 
     @staticmethod
-    def render(form_id, hidden_input_id, entity, search_id, mode="select"):
+    def render(form_id, hidden_input_id, entity, search_id, label, mode="select"):
 
         return c.Div(
-            AutoSearch.search_bar(search_id),
+            AutoSearch.search_bar(search_id, label),
             AutoSearch.dropdown(search_id),
+
+            c.Input(type="hidden", id=hidden_input_id, name=hidden_input_id),
+            
             AutoSearch.auto_search(
                 form_id,
                 hidden_input_id,
@@ -143,3 +165,7 @@ class AutoSearch:
                 mode
             )
         )
+
+
+
+        

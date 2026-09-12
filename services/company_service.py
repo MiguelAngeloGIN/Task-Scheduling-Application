@@ -8,11 +8,13 @@ import secrets
 from library.validators import InputValidator
 from datetime import datetime, timedelta, timezone
 from services.email_service import EmailService
+from utils.decorators_util import transaction
 
 
 class CompanyService:
 
     @staticmethod
+    @transaction
     def create_company(name, user_id):
         InputValidator.validate_name(name)
         InputValidator.validate_id(user_id)
@@ -31,6 +33,7 @@ class CompanyService:
 
    
     @staticmethod
+    @transaction
     def create_invitation(invited_email, company_id, invited_by):
         InputValidator.validate_email(invited_email)
         InputValidator.validate_id(company_id)
@@ -122,6 +125,7 @@ class CompanyService:
             return query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=token)
 
     @staticmethod
+    @transaction
     def remove_user_from_company(user_id):
         InputValidator.validate_id(user_id)
 
@@ -143,20 +147,3 @@ class CompanyService:
             raise ValueError("Company does not exist.")
 
         return company[0]
-
-
-    @staticmethod
-    def get_company_users(admin_id):
-        InputValidator.validate_id(admin_id)
-
-        admin = Get_Sql.get_sql(models.User, user_id=admin_id )
-
-        if not admin:
-            raise ValueError("Admin does not exist.")
-
-        admin = admin[0]
-
-        if admin.company_id is None:
-            raise ValueError("Admin does not belong to a company.")
-
-        return Get_Sql.get_sql(models.User, company_id=admin.company_id)    

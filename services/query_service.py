@@ -20,6 +20,19 @@ class QueryService:
 
         return Get_Sql.get_sql(models.User, company_id=admin.company_id)
 
+
+    @staticmethod
+    def get_company_user(user_id, company_id):
+        InputValidator.validate_id(user_id)
+        InputValidator.validate_id(company_id)
+
+        user = Get_Sql.get_sql(models.User, user_id=user_id, company_id=company_id)
+   
+        if not user:
+            raise ValueError("User does not exist in this company.")
+
+        return user[0]
+
     @staticmethod
     def get_company_teams(admin_id):
         InputValidator.validate_id(admin_id)
@@ -36,6 +49,17 @@ class QueryService:
 
         return Get_Sql.get_sql(models.Team, company_id=admin.company_id)
 
+    @staticmethod
+    def get_company_team(team_id, company_id):
+        InputValidator.validate_id(team_id)
+        InputValidator.validate_id(company_id)
+
+        team = Get_Sql.get_sql(models.Team, team_id=team_id, company_id=company_id)
+
+        if not team:
+            raise ValueError("Team does not exist in this company.")
+
+        return team[0]
 
     @staticmethod
     def get_user(user_id):
@@ -47,6 +71,8 @@ class QueryService:
             raise ValueError("User does not exist.")
 
         return user[0]
+
+    
 
     @staticmethod
     def get_user_by_email(email):
@@ -81,6 +107,7 @@ class QueryService:
 
         return team[0]
 
+
     @staticmethod
     def get_invitation(token):
         InputValidator.validate_str(token)
@@ -91,3 +118,17 @@ class QueryService:
             raise ValueError("Invitation does not exist.")
 
         return invitation[0]
+
+
+    @staticmethod
+    def search_user(query):
+        InputValidator.validate_str(query)
+
+        return Get_Sql.search_sql(models.User, query, "email")
+    
+    @staticmethod
+    def search_team(query):
+        InputValidator.validate_str(query)
+
+        return Get_Sql.search_sql(models.Team, query, "name")
+    

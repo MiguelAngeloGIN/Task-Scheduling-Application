@@ -13,7 +13,7 @@ class Company(Base):
     __tablename__ = "Company"
 
     company_id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     teams = relationship("Team", back_populates="company")
@@ -28,8 +28,11 @@ class Team(Base):
     name = Column(String(50), nullable=False)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     company_id = Column(Integer, ForeignKey("Company.company_id"))
+    is_active = Column(Boolean, default=True)
+    leader_id = Column(Integer, ForeignKey("User.user_id"))
+    leader = relationship("User", foreign_keys=[leader_id], back_populates="led_teams")
     company = relationship("Company", back_populates="teams")
-    users = relationship("User", back_populates="team")
+    users = relationship("User", foreign_keys="[User.team_id]", back_populates="team")
     tasks = relationship("Task", back_populates="team")
 
 
@@ -42,16 +45,16 @@ class User(Base):
     email = Column(String(50), nullable=False, unique=True)
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False)
-    is_team_leader = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     reset_token = Column(String(255))
     reset_token_expires_at = Column(TIMESTAMP)
     company_id = Column(Integer, ForeignKey("Company.company_id"))
     team_id = Column(Integer, ForeignKey("Team.team_id"))
     company = relationship("Company", back_populates="users")
-    team = relationship("Team", back_populates="users")
+    team = relationship("Team", foreign_keys="[User.team_id]", back_populates="users")
     task_histories = relationship("TaskHistory", back_populates="author_user")
     sent_invitations = relationship("Invitation", back_populates="inviter")
+    led_teams = relationship("Team",foreign_keys="[Team.leader_id]", back_populates="leader")
     
 
 
@@ -63,6 +66,7 @@ class Objective(Base):
     name = Column(String(50), nullable=False, unique=True)
     description = Column(String(500))
     progress = Column(Numeric(5, 2), default=0)
+    is_archived = Column(Boolean, default=False)
     company_id = Column(Integer, ForeignKey("Company.company_id"))
     company = relationship("Company", back_populates="objectives")
     tasks = relationship("Task", back_populates="objective")

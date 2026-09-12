@@ -14,6 +14,13 @@ class Get_Sql:
                 raise ValueError(f"{model.__name__} has no attribute '{key}'.")
         results = query.all()
         return results
+        
+    @staticmethod
+    def search_sql(model, query, attribute):
+        if not hasattr(model, attribute):
+            raise ValueError(f"{model.__name__} has no attribute '{attribute}'.")
 
-
+        return session.query(model).filter(
+            getattr(model, attribute).like(f"%{query}%")
+        ).all()
 

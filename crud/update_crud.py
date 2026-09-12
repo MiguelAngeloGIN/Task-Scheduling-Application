@@ -19,5 +19,4 @@ class Update_Sql:
                 setattr(instance, key, value)
             else:
                 raise ValueError(f"{model.__name__} has no attribute '{key}'.")
-        session.commit()
         print(f"{model.__name__} with {pk_name}={pk_value} updated.")

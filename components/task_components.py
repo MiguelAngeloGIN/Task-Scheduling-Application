@@ -110,7 +110,8 @@ class Pages:
                     hidden_input_id='dependencies',
                     entity='task',
                     search_id='dependencies',
-                    mode='select'
+                    mode='select',
+                    label='Dependencies'
                 ),
 
                 c.Button(button_text, type='submit', onclick="return confirm('Are you sure you want to save these changes?')" if task_id else None),
@@ -204,7 +205,8 @@ class Pages:
                     hidden_input_id=hidden_input_id,
                     mode=mode,
                     entity='task',
-                    search_id= 'dependencies' 
+                    search_id= 'dependencies',
+                    label='Dependencies',
 
                 ),
 

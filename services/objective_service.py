@@ -7,11 +7,13 @@ import secrets
 from library.validators import InputValidator
 from datetime import datetime, timedelta, timezone
 from services.email_service import EmailService
+from utils.decorators_util import transaction
 
 
 class ObjectiveService:
 
     @staticmethod
+    @transaction
     def create_objective(name, company_id, description):
         InputValidator.validate_name(name)
         InputValidator.validate_id(company_id)
