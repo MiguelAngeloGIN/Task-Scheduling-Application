@@ -14,7 +14,7 @@ class Pages:
                                               c.Br(),
                                               c.Br(),
                                          c.Button('Create Company', type='submit'),
-                                         method='POST', action='/create-company'
+                                         method='POST', action='/admin/company/create'
                                      )))
 
    
@@ -23,14 +23,14 @@ class Pages:
         return c.Titled('Dashboard',
                      c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P()),
                         c.P('Welcome to your dashboard!'),
-                        c.Div(c.Form(c.Button('INVITE TO COMPANY', type = "submit"), method='GET', action='/invite-to-company')),
-                        c.Div(c.Form(c.Button('CREATE TEAM', type='submit'), method='GET', action='/create-team')),
-                        c.Div(c.Form(c.Button('DEACTIVATE TEAM', type = "submit"), method='GET', action='/deactivate-team')),
-                        c.Div(c.Form(c.Button('ADD TO TEAM', type = "submit"), method='GET', action='/add-to-team')),
-                        c.Div(c.Form(c.Button('REMOVE FROM TEAM', type = "submit"), method='GET', action='/remove-from-team')),
-                        c.Div(c.Form(c.Button('ASSIGN TEAM LEADER', type = "submit"), method='GET', action='/assign-team-leader')),
-                        c.Div(c.Form(c.Button('REMOVE TEAM LEADER', type = "submit"), method='GET', action='/remove-team-leader')),
-                        c.Div(c.Form(c.Button('VIEW TEAMS', type = "submit"), method='GET', action='/view-teams'))
+                        c.Div(c.Form(c.Button('INVITE TO COMPANY', type = "submit"), method='GET', action='/admin/company/invite')),
+                        c.Div(c.Form(c.Button('CREATE TEAM', type='submit'), method='GET', action='/admin/team/create')),
+                        c.Div(c.Form(c.Button('ADD TO TEAM', type = "submit"), method='GET', action='/admin/team/add')),
+                        c.Div(c.Form(c.Button('REMOVE FROM TEAM', type = "submit"), method='GET', action='/admin/team/remove')),
+                        c.Div(c.Form(c.Button('ASSIGN TEAM LEADER', type = "submit"), method='GET', action='/admin/team/assign-leader')),
+                        c.Div(c.Form(c.Button('REMOVE TEAM LEADER', type = "submit"), method='GET', action='/admin/team/remove-leader')),
+                        c.Div(c.Form(c.Button('VIEW TEAMS', type = "submit"), method='GET', action='/admin/team/view')),
+                        c.Div(c.Form(c.Button('DEACTIVATE TEAM', type = "submit"), method='GET', action='/admin/team/deactivate'))
                         )
 
     @staticmethod
@@ -52,17 +52,34 @@ class Pages:
                         )
 
     @staticmethod
-    def invite_user_page(message=None, message_type=None, email=''):
-        return Pages.single_field_form(
-            message=message,
-            message_type=message_type,
-            title='Invite User to Company',
-            action='/invite-to-company',
-            value=email,
-            button='Send Invitation',
-            label = 'Email',
-            input_type='email'
+    def invite_user_page(message=None, message_type=None):
+
+         return c.Titled(
+        "Invite User to Company",
+
+        c.Div(
+            c.P(f'{message}', cls=f"message {message_type}") if message else ""
+        ),
+
+        c.Form(
+            AutoSearch.render(
+                form_id="invite-form",
+                hidden_input_id="user_id",
+                entity="all-users",
+                search_id="user-search",
+                label="User email:",
+                mode="select_one"
+            ),
+
+            c.Button("Send Invitation", type="submit"),
+
+            c.A("Back to dashboard", href="/admin-dashboard"),
+
+            id="invite-form",
+            method="POST",
+            action="/admin/company/invite"
         )
+    )
 
     @staticmethod
     def create_team_page(message=None, message_type=None, team_name=''):
@@ -70,7 +87,7 @@ class Pages:
             message=message,
             message_type=message_type,
             title='Create Team',
-            action='/create-team',
+            action='/admin/team/create',
             value=team_name,
             button='Create Team',
             label='Team Name'
@@ -82,7 +99,7 @@ class Pages:
             message=message,
             message_type=message_type,
             title='Deactivate Team',
-            action='/deactivate-team',
+            action='/admin/team/deactivate',
             value=team_name,
             button='Deactivate Team',
             label='Team Name'

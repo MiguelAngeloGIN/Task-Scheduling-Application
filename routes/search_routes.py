@@ -44,3 +44,19 @@ def search_team_by_name(request, query: Optional[str] = None):
 ])
 
 
+@rt("/search-all-users", methods=["GET"])
+def search_all_users(request, query: Optional[str] = None):
+
+    current_user_id = int(request.state.admin_payload["sub"]) if hasattr(request.state, "admin_payload") else None
+    
+    users = QueryService.search_all_users(query, exclude_user_id=current_user_id) if query else []
+    
+
+    return JSONResponse([
+        {
+            "id": user.user_id,
+            "name": user.email
+        }
+        for user in users
+    ])
+

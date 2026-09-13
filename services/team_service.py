@@ -74,16 +74,32 @@ class TeamService:
 
     @staticmethod
     @transaction
-    def remove_user_from_team(user_id):
-        InputValidator.validate_id(user_id)
+    def remove_user_from_team(user_id, team_id):
+        user_id = InputValidator.validate_id(user_id)
+        team_id = InputValidator.validate_id(team_id)
 
         user = Get_Sql.get_sql(
             models.User,
             user_id=user_id
         )
 
+        team = Get_Sql.get_sql(
+            models.Team,
+            team_id=team_id
+        )
+
         if not user:
             raise ValueError("User does not exist.")
+
+        user = user[0]
+
+        if not team:
+            raise ValueError("Team does not exist.")
+
+        team = team[0]
+
+        if user.team_id != team_id:
+            raise ValueError("User is not a member of this team.")
 
         return query_handling(Update_Sql.update_sql, model=models.User, 
                               user_id=user_id, team_id=None)

@@ -6,23 +6,22 @@ from core.app import rt
 from utils.jwt_util import JWTUtils
 
 
-@rt('/signup', methods=['GET'])
+@rt('/auth/signup', methods=['GET'])
 def get_signup():
     return Pages.signup_page()
 
     
-@rt('/signup', methods=['POST'])
+@rt('/auth/signup', methods=['POST'])
 def post_signup(first_name: str, last_name: str, email: str, password: str):
    
     try:
-        AuthService().sign_up(
+        AuthService.sign_up(
             first_name=first_name,
             last_name=last_name,
             email=email,
             password=password
         )
-        print("POST /signup triggered")
-        return c.RedirectResponse('/login?message=Account created successfully&message_type=success', status_code=302)
+        return c.RedirectResponse('/auth/login?message=Account created successfully&message_type=success', status_code=302)
     
     except ValueError as e:
         return Pages.signup_page(
@@ -33,12 +32,12 @@ def post_signup(first_name: str, last_name: str, email: str, password: str):
             email=email
         )
 
-@rt('/admin-signup', methods=['GET'])
+@rt('/auth/admin-signup', methods=['GET'])
 def get_admin_signup():
-    return Pages.signup_page(action='/company-signup')
+    return Pages.signup_page(action='/auth/admin-signup')
 
-@rt('/company-signup', methods=['POST'])
-def post_company_signup(first_name: str, last_name: str,
+@rt('/auth/admin-signup', methods=['POST'])
+def post_admin_signup(first_name: str, last_name: str,
                         email: str, password: str):
     try:
         user = AuthService.sign_up(
@@ -51,12 +50,12 @@ def post_company_signup(first_name: str, last_name: str,
 
         token = AuthService.generate_jwt(user)
 
-        response = c.RedirectResponse( '/create-company', status_code=302)
+        response = c.RedirectResponse( '/admin/company/create', status_code=302)
         response.set_cookie("jwt_token", token, httponly=True, secure=False, samesite='lax', max_age=24*60*60) 
         return response
 
     except ValueError as e:
-        return Pages.signup_page(action='/company-signup',
+        return Pages.signup_page(action='/auth/admin-signup',
             message=str(e),
             message_type="error",
             first_name=first_name,
@@ -69,12 +68,12 @@ def post_company_signup(first_name: str, last_name: str,
     
 
 
-@rt('/login', methods=['GET'])
+@rt('/auth/login', methods=['GET'])
 def get_login(message: Optional[str] = None, message_type: Optional[str] = None):
      return Pages.login_page(message=message, message_type=message_type)
 
 
-@rt('/login', methods=['POST'])
+@rt('/auth/login', methods=['POST'])
 def post_login(email: str, password: str):
     try:
         token = AuthService.login(email=email, password=password)
@@ -99,18 +98,18 @@ def post_login(email: str, password: str):
         )
 
     
-@rt('/logout', methods=['POST'])
+@rt('/auth/logout', methods=['POST'])
 def post_logout():
-    response = c.RedirectResponse('/login?message=Logged out&message_type=success', status_code=302)
+    response = c.RedirectResponse('/auth/login?message=Logged out&message_type=success', status_code=302)
     response.delete_cookie("jwt_token")
     return response
 
 
-@rt('/reset-password', methods = ['GET'])
+@rt('/auth/reset-password', methods = ['GET'])
 def get_password_reset():
     return Pages.reset_password_page()
 
-@rt('/reset-password', methods = ['POST'])
+@rt('/auth/reset-password', methods = ['POST'])
 def post_password_reset(email: str):
     try:
         AuthService.create_password_reset(email=email)
@@ -119,7 +118,7 @@ def post_password_reset(email: str):
         return Pages.reset_password_page(message=str(e), message_type="error")
 
 
-@rt('/new-password', methods = ['GET'])
+@rt('/auth/new-password', methods = ['GET'])
 def get_new_password(message: Optional[str] = None, message_type: Optional[str] = None, token: str = ''):
     try:
         AuthService.verify_reset_token(token=token)
@@ -127,14 +126,14 @@ def get_new_password(message: Optional[str] = None, message_type: Optional[str] 
     except ValueError as e:
         return Pages.invalid_token_page(message=str(e), message_type="error")
 
-@rt('/new-password', methods = ['POST'])
+@rt('/auth/new-password', methods = ['POST'])
 def post_new_password(token: str, new_password: str, confirm_password: str):
     try:
         if new_password != confirm_password:
             raise ValueError("The passwords do not match.")
 
         AuthService.reset_password(token=token, new_password=new_password)
-        return c.RedirectResponse('/login?message=Password reset successfully&message_type=success', status_code=302)
+        return c.RedirectResponse('/auth/login?message=Password reset successfully&message_type=success', status_code=302)
     except ValueError as e:
         if "token" in str(e).lower():
             return Pages.invalid_token_page(message=str(e), message_type="error")

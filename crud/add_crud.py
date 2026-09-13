@@ -8,6 +8,7 @@ class Add_Sql:
     def add_company(name):
         new_company = models.Company(name=name)
         session.add(new_company)
+        session.flush() 
         return new_company
 
     @staticmethod

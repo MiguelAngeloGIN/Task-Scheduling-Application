@@ -133,4 +133,10 @@ class QueryService:
         InputValidator.validate_id(company_id)
 
         return Get_Sql.search_by_company_sql(models.Team, company_id, query, "name")
+
+    @staticmethod
+    def search_all_users(query, exclude_user_id=None):
+        InputValidator.validate_str(query)
+
+        return Get_Sql.search_all_users(query, exclude_user_id=exclude_user_id)
     

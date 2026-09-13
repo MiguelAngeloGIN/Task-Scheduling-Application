@@ -25,3 +25,15 @@ class Get_Sql:
             getattr(model, attribute).like(f"%{query}%")
         ).all()
 
+    @staticmethod
+    def search_all_users(query, exclude_user_id=None):
+        users = session.query(models.User).filter(
+        models.User.email.like(f"%{query}%")
+        )
+
+        if exclude_user_id:
+            users = users.filter(
+            models.User.user_id != exclude_user_id
+        )
+
+        return users.all()

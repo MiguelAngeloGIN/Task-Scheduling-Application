@@ -27,6 +27,7 @@ class AutoSearch:
     def auto_search(form_id, hidden_input_id, entity, search_id, mode="select"):
 
         script = """
+           console.log("AUTO SEARCH LOADED");
         document.addEventListener("DOMContentLoaded", () => {
 
             let selected_storage = new Map();

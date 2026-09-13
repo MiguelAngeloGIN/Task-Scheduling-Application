@@ -14,10 +14,38 @@ from utils.decorators_util import transaction
 class CompanyService:
 
     @staticmethod
+    def add_user_to_company(user_id, company_id):
+        user_id = InputValidator.validate_id(user_id)
+        company_id = InputValidator.validate_id(company_id)
+
+        company = Get_Sql.get_sql(models.Company, company_id=company_id)
+
+        if not company:
+            raise ValueError("Company does not exist.")
+
+        users = Get_Sql.get_sql(models.User, user_id=user_id
+        )
+        user = users[0] if users else None
+
+        if not user:
+            raise ValueError("User does not exist.")
+
+        if user.company_id is not None:
+            raise ValueError("User already belongs to a company.")
+
+        query_handling(Update_Sql.update_sql, model=models.User, user_id=user.user_id, company_id=company_id)
+
+
+    @staticmethod
+    def delete_invitation(token):
+        return query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=token)
+
+
+    @staticmethod
     @transaction
     def create_company(name, user_id):
         InputValidator.validate_name(name)
-        InputValidator.validate_id(user_id)
+        user_id = InputValidator.validate_id(user_id)
 
         users = Get_Sql.get_sql (models.User, user_id=user_id)
         if not users:
@@ -28,8 +56,41 @@ class CompanyService:
             raise ValueError("User already belongs to a company.")
 
         company =query_handling(Add_Sql.add_company, name=name, error="Company name already exists.")
+
         CompanyService.add_user_to_company(user_id=user_id, company_id=company.company_id)
         return company
+
+
+
+    @staticmethod
+    @transaction
+    def accept_invitation(user_id, company_id, token): 
+        user_id = InputValidator.validate_id(user_id)
+        company_id = InputValidator.validate_id(company_id)
+
+        invitation = Get_Sql.get_sql(models.Invitation,token=token)
+
+        if not invitation:
+            raise ValueError("Invitation does not exist or has expired.")
+
+        invitation = invitation[0]
+
+        if invitation.company_id != company_id:
+            raise ValueError("Invitation does not belong to this company.")
+        users = Get_Sql.get_sql(models.User, user_id=user_id)
+
+        if not users:
+            raise ValueError("User does not exist.")
+
+        user = users[0]
+
+        if invitation.invited_email != user.email:
+            raise ValueError("Invitation email does not match user email.")
+
+        CompanyService.add_user_to_company(user_id=user_id, company_id=company_id)
+
+        query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=token)
+        return True
 
    
     @staticmethod
@@ -98,36 +159,12 @@ class CompanyService:
 
         return invitation_link
 
-
-    @staticmethod
-    def add_user_to_company(user_id, company_id, token=None):
-        InputValidator.validate_id(user_id)
-        InputValidator.validate_id(company_id)
-
-        company = Get_Sql.get_sql(models.Company, company_id=company_id)
-
-        if not company:
-            raise ValueError("Company does not exist.")
-
-        users = Get_Sql.get_sql(models.User, user_id=user_id
-        )
-        user = users[0] if users else None
-
-        if not user:
-            raise ValueError("User does not exist.")
-
-        if user.company_id is not None:
-            raise ValueError("User already belongs to a company.")
-
-        query_handling(Update_Sql.update_sql, model=models.User, user_id=user.user_id, company_id=company_id)
-
-        if token:
-            return query_handling(Delete_Sql.delete_sql, model=models.Invitation, token=token)
+        
 
     @staticmethod
     @transaction
     def remove_user_from_company(user_id):
-        InputValidator.validate_id(user_id)
+        user_id = InputValidator.validate_id(user_id)
 
         user = Get_Sql.get_sql(models.User, user_id=user_id)
 
@@ -139,7 +176,7 @@ class CompanyService:
 
     @staticmethod
     def get_company(company_id):
-        InputValidator.validate_id(company_id)
+        company_id = InputValidator.validate_id(company_id)
 
         company = Get_Sql.get_sql(models.Company, company_id=company_id)
 

@@ -43,5 +43,7 @@ def transaction(func):
         except Exception:
             session.rollback()
             raise
+        finally:
+            session.close()
 
     return wrapper

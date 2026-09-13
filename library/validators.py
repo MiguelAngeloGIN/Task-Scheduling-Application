@@ -129,11 +129,11 @@ class InputValidator:
 
     @staticmethod 
     def validate_id(id_value):
-       if not isinstance(id_value, int):
-          raise ValueError("ID must be an integer.")
-       if id_value <= 0:
-          raise ValueError("ID must be a positive integer.")
-       return id_value
+        try:
+            return int(id_value)
+        except (ValueError, TypeError):
+            raise ValueError("ID must be an integer.")
+    
 
 
     @staticmethod
