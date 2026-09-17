@@ -46,6 +46,7 @@ def check_circular_dependencies(task_graph):
                 return result
     return {"has_cycle": False}
 
-def check_self_dependency(task_id, dependencies):
-    if task_id in dependencies:
-        raise ValueError(f"Task with ID {task_id} cannot depend on itself.")
+def check_self_dependency(task_id, dependency_id):
+    if task_id == dependency_id:
+        raise ValueError('A task can not depend on itself.')
+    

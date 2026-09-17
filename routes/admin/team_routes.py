@@ -2,10 +2,10 @@ from services.company_service import CompanyService
 from services.team_service import TeamService
 from services.query_service import QueryService
 from typing import Optional
-from components.admin_components import Pages
+from components.company_team_objective_components import Pages
 from fasthtml import common as c
 from core.app import rt
-from utils.decorators_util import admin_required
+from permissions.decorators import admin_required
 from utils.json_util import parse_json_input
 
 

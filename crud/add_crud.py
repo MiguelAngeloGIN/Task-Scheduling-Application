@@ -19,7 +19,6 @@ class Add_Sql:
             email=email,
             password_hash=password_hash,
             company_id=None,
-            team_id=None,
             reset_token=reset_token,
             reset_token_expires_at=reset_token_expires_at,
             is_admin=is_admin,
@@ -52,19 +51,18 @@ class Add_Sql:
 
 
     @staticmethod
-    def add_task(name, description, status, importance, deadline, duration, difficulty, team_id, objective_id):
+    def add_task(name, description, status, importance, deadline, team_id, objective_id):
         new_task = models.Task(
             name=name,
             description=description,
             status=status,
             importance=importance,
             deadline=deadline,
-            duration=duration,
-            difficulty=difficulty,
             team_id=team_id,
             objective_id=objective_id
         )
         session.add(new_task)
+        session.flush()
         print(f"Task {new_task.task_id} added.")
         return new_task
 
@@ -79,16 +77,15 @@ class Add_Sql:
         return new_dependency
 
     @staticmethod
-    def add_task_history(action, description, old_value, new_value, author_id, task_id):
+    def add_task_history(action, description, author_id, task_id):
         new_task_history = models.TaskHistory(
             action=action,
             description=description,
-            old_value=old_value,
-            new_value=new_value,
             author=author_id,
             task=task_id
         )
         session.add(new_task_history)
+        session.flush()
         print(f"TaskHistory {new_task_history.task_history_id} added.")
         return new_task_history
 
@@ -106,7 +103,15 @@ class Add_Sql:
         print(f"Invitation {new_invitation.invitation_id} added.")
         return new_invitation
 
-    
+    @staticmethod
+    def add_team_member(team_id, user_id):
+        new_team_member = models.TeamMember(
+            team_id=team_id,
+            user_id=user_id
+        )
+        session.add(new_team_member)
+        print(f"TeamMember {new_team_member.team_id}-{new_team_member.user_id} added.")
+        return new_team_member
 
-
+   
     

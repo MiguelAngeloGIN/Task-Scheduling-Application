@@ -3,6 +3,7 @@ from typing import Optional
 from components.auth_components import Pages
 from fasthtml import common as c
 from core.app import rt
+from services.query_service import QueryService
 from utils.jwt_util import JWTUtils
 
 
@@ -64,10 +65,6 @@ def post_admin_signup(first_name: str, last_name: str,
         )
 
 
-
-    
-
-
 @rt('/auth/login', methods=['GET'])
 def get_login(message: Optional[str] = None, message_type: Optional[str] = None):
      return Pages.login_page(message=message, message_type=message_type)
@@ -80,9 +77,19 @@ def post_login(email: str, password: str):
 
         payload = JWTUtils.decode_jwt(token)
 
-        if payload['admin']:
+        user = QueryService.get_user(user_id=int(payload['sub']))
+
+        if user.company_id is None:
+            response = c.RedirectResponse(
+                '/dashboard?message=You do not belong to a company yet.&message_type=info',
+                status_code=302
+            )
+
+        elif payload['admin']:
             response = c.RedirectResponse('/admin-dashboard?message=Logged in successfully&message_type=success', status_code=302)
 
+        elif QueryService.is_team_leader(user_id=user.user_id):
+            response = c.RedirectResponse('/leader-dashboard?message=Logged in successfully&message_type=success', status_code=302)
         else:
             response = c.RedirectResponse('/dashboard?message=Logged in successfully&message_type=success', status_code=302)
             
@@ -138,4 +145,6 @@ def post_new_password(token: str, new_password: str, confirm_password: str):
         if "token" in str(e).lower():
             return Pages.invalid_token_page(message=str(e), message_type="error")
         return Pages.new_password_page(message=str(e), message_type="error", token=token)
+
+
 

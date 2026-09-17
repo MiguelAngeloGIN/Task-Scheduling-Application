@@ -29,10 +29,9 @@ class Team(Base):
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     company_id = Column(Integer, ForeignKey("Company.company_id"))
     is_active = Column(Boolean, default=True)
-    leader_id = Column(Integer, ForeignKey("User.user_id"))
-    leader = relationship("User", foreign_keys=[leader_id], back_populates="led_teams")
     company = relationship("Company", back_populates="teams")
-    users = relationship("User", foreign_keys="[User.team_id]", back_populates="team")
+    team_members = relationship("TeamMember", back_populates="team")
+    leaders = relationship("User", foreign_keys="User.led_team_id", back_populates="led_team")
     tasks = relationship("Task", back_populates="team")
 
 
@@ -49,15 +48,22 @@ class User(Base):
     reset_token = Column(String(255))
     reset_token_expires_at = Column(TIMESTAMP)
     company_id = Column(Integer, ForeignKey("Company.company_id"))
-    team_id = Column(Integer, ForeignKey("Team.team_id"))
+    led_team_id = Column (Integer, ForeignKey("Team.team_id"))
     company = relationship("Company", back_populates="users")
-    team = relationship("Team", foreign_keys="[User.team_id]", back_populates="users")
     task_histories = relationship("TaskHistory", back_populates="author_user")
     sent_invitations = relationship("Invitation", back_populates="inviter")
-    led_teams = relationship("Team",foreign_keys="[Team.leader_id]", back_populates="leader")
+    team_memberships = relationship("TeamMember", back_populates="user")
+    led_team = relationship("Team",   foreign_keys=[led_team_id], back_populates="leaders"
+)
+
+class TeamMember(Base):
+    __tablename__ = "TeamMember"
+
+    team_id = Column(Integer, ForeignKey("Team.team_id"), primary_key=True)
+    user_id = Column(Integer, ForeignKey("User.user_id"), primary_key=True)
+    team = relationship("Team", back_populates="team_members")
+    user = relationship("User", back_populates="team_memberships")
     
-
-
 
 class Objective(Base):
     __tablename__ = "Objective"
@@ -80,13 +86,10 @@ class Task(Base):
     status = Column(String(50), default="pending")  # pending, in progress, complete, overdue
     importance = Column(Integer)
     deadline = Column(TIMESTAMP)
-    duration = Column(Integer)
-    difficulty = Column(Integer)
     team_id = Column(Integer, ForeignKey("Team.team_id"))
     objective_id = Column(Integer, ForeignKey("Objective.objective_id"))
     team = relationship("Team", back_populates="tasks")
     objective = relationship("Objective", back_populates="tasks")
-    task_histories = relationship("TaskHistory", back_populates="task_obj")
     dependant_dependencies = relationship("Dependency", foreign_keys="[Dependency.dependant]", back_populates="dependant_task")
     dependency_dependencies = relationship("Dependency", foreign_keys="[Dependency.dependency]", back_populates="dependency_task")
 
@@ -103,15 +106,12 @@ class TaskHistory(Base):
     __tablename__ = "Task_History"
 
     task_history_id = Column(Integer, primary_key=True, autoincrement=True)
-    action = Column(String(50), nullable=False)  # update, delete, create, add_dependency, remove_dependency
-    description = Column(String(500))  # changes explanation
-    old_value = Column(JSON)  
-    new_value = Column(JSON)
+    action = Column(String(50), nullable=False)  # create, complete, delete
+    description = Column(String(500))  # explanation
     created_at = Column(TIMESTAMP, server_default=func.current_timestamp())
     author = Column(Integer, ForeignKey("User.user_id"))
-    task = Column(Integer, ForeignKey("Task.task_id"))
+    task = Column(Integer)
     author_user = relationship("User", foreign_keys=[author], back_populates="task_histories")
-    task_obj = relationship("Task", foreign_keys=[task], back_populates="task_histories")
     
 
 

@@ -3,12 +3,12 @@ from crud.update_crud import Update_Sql
 from crud.add_crud import Add_Sql
 from crud.delete_crud import Delete_Sql
 from database import models
-from utils.query_util import query_handling
+from utils.db_query_util import query_handling
 import secrets
 from library.validators import InputValidator
 from datetime import datetime, timedelta, timezone
 from services.email_service import EmailService
-from utils.decorators_util import transaction
+from utils.db_query_util import transaction
 
 
 class CompanyService:
@@ -174,13 +174,4 @@ class CompanyService:
         return query_handling(Update_Sql.update_sql, model=models.User, user_id=user_id, company_id=None
         )
 
-    @staticmethod
-    def get_company(company_id):
-        company_id = InputValidator.validate_id(company_id)
-
-        company = Get_Sql.get_sql(models.Company, company_id=company_id)
-
-        if not company:
-            raise ValueError("Company does not exist.")
-
-        return company[0]
+    

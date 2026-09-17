@@ -41,6 +41,6 @@ class JWTUtils:
         payload = JWTUtils.verify_jwt(token)
 
         if not payload.get("admin"):
-            raise ValueError("Admin access required.")
+            raise PermissionError("Admin access required.")
 
         return payload

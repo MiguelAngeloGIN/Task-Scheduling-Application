@@ -2,10 +2,10 @@ from services.company_service import CompanyService
 from services.team_service import TeamService
 from services.query_service import QueryService
 from typing import Optional
-from components.admin_components import Pages
+from components.company_team_objective_components import Pages
 from fasthtml import common as c
 from core.app import rt
-from utils.decorators_util import admin_required
+from permissions.decorators import admin_required
 from utils.json_util import parse_json_input
 
 
@@ -16,8 +16,6 @@ def get_create_company(request, message: Optional[str] = None, message_type: Opt
          admin_payload = request.state.admin_payload
          user = QueryService.get_user(user_id=int(admin_payload['sub']))
 
-         print(admin_payload)
-         print(type(admin_payload['sub']))
 
          if user.company_id is not None:
               return c.RedirectResponse(
@@ -46,12 +44,12 @@ def post_create_company(request, name: str):
     
         CompanyService.create_company(name=name,  user_id=int(admin_payload['sub']))
         return c.RedirectResponse(
-            '/admin/company/create?message=Company created successfully&message_type=success',
+            '/admin-dashboard?message=Company created successfully&message_type=success',
             status_code=302
         )
     except ValueError as e:
         return c.RedirectResponse(
-            f'/admin/company/create?message=Failed to create company: {str(e)}&message_type=error',
+            f'/admin-dashboard?message=Failed to create company: {str(e)}&message_type=error',
             status_code=302
         )
 

@@ -8,9 +8,9 @@ import secrets
 from services.email_service import EmailService
 from datetime import datetime, timezone, timedelta
 from utils.jwt_util import JWTUtils
-from utils.query_util import query_handling
+from utils.db_query_util import query_handling
 from database import models
-from utils.decorators_util import transaction
+from utils.db_query_util import transaction
 
 
 class AuthService:
@@ -81,7 +81,7 @@ class AuthService:
     
         query_handling(Update_Sql.update_sql, models.User, user_id = user_id, reset_token = new_token, reset_token_expires_at = expiry)
         
-        reset_link = f"http://localhost:5001/new-password?token={new_token}"
+        reset_link = f"http://localhost:5001/auth/new-password?token={new_token}"
         EmailService.send_reset_email(email, reset_link)
         return reset_link
 

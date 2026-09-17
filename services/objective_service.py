@@ -2,12 +2,12 @@ from crud.get_crud import Get_Sql
 from crud.update_crud import Update_Sql
 from crud.add_crud import Add_Sql
 from database import models
-from utils.query_util import query_handling
+from utils.db_query_util import query_handling
 import secrets
 from library.validators import InputValidator
 from datetime import datetime, timedelta, timezone
 from services.email_service import EmailService
-from utils.decorators_util import transaction
+from utils.db_query_util import transaction
 
 
 class ObjectiveService:
@@ -25,3 +25,19 @@ class ObjectiveService:
 
         objective = query_handling(Add_Sql.add_objective, name=name, company_id=company_id, description=description, error="Objective name already exists.")
         return objective
+
+    @staticmethod
+    @transaction
+    def archive_objective(objective_id):
+        objective_id = InputValidator.validate_id(objective_id)
+
+        old_objective = Get_Sql.get_sql(models.Objective, objective_id=objective_id)
+        if not old_objective:
+            raise ValueError("Objective not found.")
+        old_objective = old_objective[0]
+
+        Update_Sql.update_sql(models.Objective, objective_id=objective_id, archived=True)
+
+        return True
+
+  

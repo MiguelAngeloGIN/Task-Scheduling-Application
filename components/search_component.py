@@ -1,4 +1,5 @@
 from fasthtml import common as c
+from typing import Optional
 
 
 class AutoSearch:
@@ -24,10 +25,9 @@ class AutoSearch:
         )
 
     @staticmethod
-    def auto_search(form_id, hidden_input_id, entity, search_id, mode="select"):
+    def auto_search(form_id, hidden_input_id, entity, search_id, mode="select", redirect_url = None):
 
         script = """
-           console.log("AUTO SEARCH LOADED");
         document.addEventListener("DOMContentLoaded", () => {
 
             let selected_storage = new Map();
@@ -55,20 +55,29 @@ class AutoSearch:
                     let option = document.createElement("li");
                     let button = document.createElement("button");
 
-                    button.textContent = result.name;
+                    button.textContent = result.objective 
+                        ? `${result.objective}: ${result.name}`
+                        : result.name;
                     button.type = "button";
 
                     button.onclick = () => {
 
+                     let display_name = result.objective
+                          ? `${result.objective}: ${result.name}`
+                          : result.name;
+
+
                         if ("{mode}" === "redirect") {
 
-                            window.location.href = `/update-{entity}/${result.id}`;
+                            window.location.href = `{redirect_url}/${result.id}`;
 
                         } 
                         
                         if ("{mode}" === "select_one") {
                             selected_storage.clear();
                             selected.innerHTML = "";
+                            search.value = "";
+                            results.innerHTML = "";
                         }
                         
                         
@@ -77,13 +86,14 @@ class AutoSearch:
 
                             selected_storage.set(result.id, {
                                 id: result.id,
-                                name: result.name
+                                name: result.name,
+                                objective: result.objective
                             });
 
 
                             let chip = document.createElement("button");
 
-                            chip.textContent = result.name;
+                            chip.textContent = display_name;
                             chip.className = "chip";
                             chip.type = "button";
                             chip.title = "Click to remove";
@@ -145,12 +155,13 @@ class AutoSearch:
         script = script.replace("{mode}", mode)
         script = script.replace("{entity}", entity)
         script = script.replace("{search_id}", search_id)
+        script = script.replace("{redirect_url}", redirect_url or "")
 
         return c.Script(script)
 
 
     @staticmethod
-    def render(form_id, hidden_input_id, entity, search_id, label, mode="select"):
+    def render(form_id, hidden_input_id, entity, search_id, label, mode="select", redirect_url=None):
 
         return c.Div(
             AutoSearch.search_bar(search_id, label),
@@ -163,7 +174,8 @@ class AutoSearch:
                 hidden_input_id,
                 entity,
                 search_id,
-                mode
+                mode,
+                redirect_url
             )
         )
 

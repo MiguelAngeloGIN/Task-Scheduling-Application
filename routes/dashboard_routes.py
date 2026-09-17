@@ -1,11 +1,14 @@
-from services.company_service import CompanyService
-from services.team_service import TeamService
+
+from os import stat
+
 from services.query_service import QueryService
+from services.team_service import TeamService
 from typing import Optional
-from components.admin_components import Pages
+from components.company_team_objective_components import Pages
 from fasthtml import common as c
 from core.app import rt
-from utils.decorators_util import admin_required
+from permissions.decorators import admin_required, auth_required, leader_required
+from components.task_components import Pages as TaskPages
 
 
 @rt('/admin-dashboard', methods=['GET'])
@@ -29,5 +32,25 @@ def get_admin_dashboard(request, message: Optional[str] = None, message_type: Op
 
     return Pages.admin_dashboard_page(message=message, 
                                       message_type=message_type)
+
+@rt('/objective-dashboard', methods=['GET'])
+@admin_required
+def get_objective_dashboard(request, message: Optional[str] = None, message_type: Optional[str] = None):
+    return Pages.objective_dashboard_page(message=message, message_type=message_type)
+
+
+
+@rt('/dashboard')
+@auth_required
+def get_dashboard(request, message: Optional[str] = None, message_type: Optional[str] = None):
+    return TaskPages.dashboard_page(message=message, message_type=message_type)
+
+@rt('/leader-dashboard', methods=['GET'])
+@leader_required
+def get_leader_dashboard(request, message: Optional[str] = None, message_type: Optional[str] = None):
+    return TaskPages.leader_dashboard_page(message=message, message_type=message_type)
+
+
+
 
 

@@ -7,13 +7,26 @@ class Pages:
         return c.Titled('Dashboard',
                      c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P()),
                         c.P('Welcome to your dashboard!'),
-                        c.Div(c.Form(c.Button('Logout', type='submit'), method='POST', action='/logout')),
-                        c.Div(c.Form(c.Button('CREATE TASK', type = "submit"), method='GET', action='/create_task')),
+                        c.Div(c.Form(c.Button('Logout', type='submit'), method='POST', action='auth/logout')),
                         c.Div(c.Form(c.Button('VIEW TASKS', type = "submit"), method='GET', action='/view_tasks')),
-                        c.Div(c.Form(c.Button('UPDATE TASKS', type = "submit"), method='GET', action='/search-update-tasks')),
-                        c.Div(c.Form(c.Button('DELETE TASKS', type = "submit"), method='GET', action='/delete-tasks')),
                         c.Div(c.Form(c.Button('COMPLETE TASKS', type = "submit"), method='GET', action='/complete-tasks'))
                         )
+
+    @staticmethod
+    def leader_dashboard_page(message=None, message_type=None):
+        return c.Titled('Dashboard',
+                     c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P()),
+                        c.P('Welcome to your dashboard!'),
+                        c.Div(c.Form(c.Button('Logout', type='submit'), method='POST', action='auth/logout')),
+                        c.Div(c.Form(c.Button('CREATE TASK', type = "submit"), method='GET', action='/task/create')),
+                        c.Div(c.Form(c.Button('MANAGE TASKS', type="submit"), method='GET', action='/tasks/manage')),
+                        c.Div(c.Form(c.Button('COMPLETE TASK', type = "submit"),method='GET', action=f'/task/complete')),
+                        c.Div(c.Form(c.Button('VIEW SCHEDULE', type = "submit"), method='GET', action='/tasks/view-schedule'))
+                        )
+
+
+
+
 
     @staticmethod
     def task_form_page(  # for creating or updating a task
@@ -21,37 +34,38 @@ class Pages:
         title='Task Form',
         action='',
         button_text='Submit',
-        task_title='',
+        task_name='',
         description='',
-        difficulty=1,
         deadline='',
         importance=1,
-        dependencies = None,
-        duration_hours=0,
-        duration_minutes=0,
-        category='Work',
+        select_objective = True,
         message=None,
         message_type=None
         ):
+
+        objective_field = (AutoSearch.render(
+                            form_id="task-form",
+                            hidden_input_id="objective_id",
+                            entity="company-objectives",
+                            search_id="objective-search",
+                            label="Objective:",
+                            mode="select_one"
+                        )
+                        if select_objective else "")
+
+        
         return c.Titled(title,
             c.Div(
-                c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
-                    c.A('Back to Dashboard', href='/dashboard'),
+                c.P(f'{message}', cls=f"message {message_type}") if message else "",
+                    c.A('Back to Dashboard', href='/leader-dashboard'),
                     c.Form(
-                        c.Label('Title: ',
-                        c.Input(type='text', name='title', value=task_title, required=True)
+                        c.Label('Name: ',
+                        c.Input(type='text', name='name', value=task_name, required=True)
                 ),
                   c.Br(),
 
                   c.Label('Description: ',
                   c.Textarea(description, name='description')
-                ),
-
-                c.Br(),
-
-                c.Label('Difficulty: ',
-                    c.Input(type='number', name='difficulty',
-                            min=1, max=5, value=difficulty, required=True)
                 ),
 
                 c.Br(),
@@ -70,54 +84,12 @@ class Pages:
 
                 c.Br(),
 
-                c.Label('Duration: ',
-                    c.Input(type='number', name='duration_hours',
-                            value=duration_hours, min=0),
-                    c.Span(' hours '),
-                    c.Input(type='number', name='duration_minutes',
-                            value=duration_minutes, min=0, max=59),
-                    c.Span(' minutes')
-                ),
-
-                c.Br(),
-
-                c.Label('Category: ',
-                    c.Input(type='radio', name='category',
-                            value='Work',
-                            checked=category=='Work',
-                            required=True),
-                    c.Span('Work'),
-
-                    c.Input(type='radio', name='category',
-                            value='Personal',
-                            checked=category=='Personal'),
-                    c.Span('Personal'),
-
-                    c.Input(type='radio', name='category',
-                            value='Business',
-                            checked=category=='Business'),
-                    c.Span('Business')
-                ),
-
-                c.Input(type='hidden',
-                        name='dependencies',
-                        id='dependencies',
-                        value=",".join(dependencies) if dependencies else ""
-                ),
-
-                AutoSearch.render(
-                    form_id='task-form',
-                    hidden_input_id='dependencies',
-                    entity='task',
-                    search_id='dependencies',
-                    mode='select',
-                    label='Dependencies'
-                ),
-
+                objective_field,
+              
                 c.Button(button_text, type='submit', onclick="return confirm('Are you sure you want to save these changes?')" if task_id else None),
 
                 method='POST',
-                action=f'/update-task/{task_id}' if task_id else action,
+                action=f'/task/update/{task_id}' if task_id else action,
                 id='task-form'
             )
         )
@@ -127,140 +99,156 @@ class Pages:
     def create_task_page(
          message=None,
          message_type=None,
-         task_title='',
+         task_name='',
          description='',
-         difficulty=1,
          deadline='',
-         importance=1,
-         duration_hours=0,
-         duration_minutes=0,
-         dependencies=None,
-         category='Work'
+         importance=1
          ):
 
      return Pages.task_form_page(
         title='Create Task',
-        action='/create_task',
+        action='/task/create',
         button_text='Create Task',
-        task_title=task_title,
+        task_name=task_name,
         description=description,
-        difficulty=difficulty,
         deadline=deadline,
         importance=importance,
-        duration_hours=duration_hours,
-        duration_minutes=duration_minutes,
-        category=category,
         message=message,
-        message_type=message_type,
-        dependencies=dependencies 
+        message_type=message_type
     )
+
+    @staticmethod
+    def manage_tasks_page(message=None, message_type=None):
+        return c.Titled(
+        "Manage Tasks",
+
+        c.Div(
+            c.P(f"{message}", cls=f"message {message_type}") if message else "",
+
+            c.Form(
+                AutoSearch.render(
+                    form_id="manage-tasks-form",
+                    hidden_input_id="task_id",
+                    entity="tasks-by-team-leader",
+                    search_id="task-search",
+                    label="Task:",
+                    mode="redirect",
+                    redirect_url=f"/task/manage/action"
+                )
+            ),
+
+            c.A("Dashboard", href="/leader-dashboard")
+        )
+    )
+
+
+    @staticmethod
+    def manage_tasks_action_page(task_id, message=None, message_type=None):
+        return c.Div(c.Titled('Select Task Action',
+            c.Div(c.Form(c.Button('UPDATE TASK', type = "submit"), method='GET', action=f'/task/update/{task_id}')),
+            c.Div(c.Form(c.Button('ADD DEPENDENCIES', type = "submit"), method='GET', action=f'/task/dependencies/add/{task_id}')),
+            c.Div(c.Form(c.Button('REMOVE DEPENDENCIES', type = "submit"), method='GET', action=f'/task/dependencies/remove/{task_id}')),
+            c.Div(c.Form(c.Button('DELETE TASK', type = "submit", onclick = "return confirm('Are you sure you want to delete this task?')"),
+                                    method='POST', action=f'/task/delete/{task_id}')),
+            c.Div(c.A('Back to Dashboard', href='/leader-dashboard'))
+        ))
+
+
 
     @staticmethod
     def update_task_page(task, message=None, message_type=None):
         return Pages.task_form_page(
-            task_id=task["_id"],
+            task_id=task.task_id,
             title='Update Task',
-            action='/update-task',
+            action=f'/task/update/{task.task_id}',
             button_text='Update Task',
-            task_title=task["title"],
-            description=task["description"],
-            difficulty=task["difficulty"],
-            deadline=task["deadline"].strftime("%Y-%m-%dT%H:%M"),
-            importance=task["importance"],
-            category=task["category"],
-            dependencies=task.get("dependencies", []),
-            duration_hours=task.get("duration", 0) // 60,
-            duration_minutes=task.get("duration", 0) % 60,
-            message=message,
-            message_type=message_type,
-            
-    )
-
-    @staticmethod 
-    def task_action_page(  # for delete or complete tasks
-         title='Task Action', 
-         action='', 
-         form_id='task-action-form', 
-         hidden_input_id='selected_tasks', 
-         button_text='Submit', 
-         message=None, 
-         message_type=None,
-         onclick=None,
-         mode = "select"
-         ):
-        return c.Titled(title,
-        c.Div(
-            c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
-            c.A('Back to Dashboard', href='/dashboard'),
-
-            c.Form(
-                c.Input(
-                    type='hidden',
-                    name=hidden_input_id,
-                    id=hidden_input_id
-                ),
-
-                AutoSearch.render(
-                    form_id=form_id,
-                    hidden_input_id=hidden_input_id,
-                    mode=mode,
-                    entity='task',
-                    search_id= 'dependencies',
-                    label='Dependencies',
-
-                ),
-
-                c.Button(button_text, type='submit', onclick=onclick if onclick else None),
-                method='POST',
-                action=action,
-                id=form_id
-                
-            )
-        )
-    )
-
-    @staticmethod
-    def delete_tasks_page(message=None, message_type=None):
-        return Pages.task_action_page(
-            title='Delete Tasks',
-            action='/delete-tasks',
-            form_id='delete-task-form',
-            hidden_input_id='selected_tasks',
-            button_text='Delete Selected Tasks',
-            message=message,
-            message_type=message_type,
-            onclick="return confirm('Are you sure you want to delete these tasks?')",
-        )
-
-    @staticmethod
-    def complete_tasks_page(message=None, message_type=None):
-        return Pages.task_action_page(
-            title='Complete Tasks',
-            action='/complete-tasks',
-            form_id='complete-task-form',
-            hidden_input_id='selected_tasks',
-            button_text='Complete Selected Tasks',
+            task_name=task.name,
+            description=task.description,
+            deadline=task.deadline.strftime("%Y-%m-%dT%H:%M"),
+            importance=task.importance,
+            select_objective= False,
             message=message,
             message_type=message_type
-              )
+            )
 
     @staticmethod
-    def search_update_tasks_page(message=None, message_type=None):
-        return Pages.task_action_page(
-            title='Search the tasks you want to update',
-            form_id='search-update-task-form',
-            hidden_input_id='selected_tasks',
-            button_text='Select',
-            message=message,
-            message_type=message_type,
-            mode="redirect"
+    def add_dependency_page(task_id: int, message=None, message_type=None):
+
+        return c.Titled("Add Dependency",
+
+        c.Form(
+            AutoSearch.render(
+                form_id="dependency-form",
+                hidden_input_id="dependency_id",
+                entity=f"tasks-for-dependency/{task_id}",
+                search_id="dependency-search",
+                label="Dependency Task:",
+                mode="select"
+            ),
+
+            c.Button("Add Dependency", type="submit"),
+
+            method="POST",
+            action=f"/task/dependencies/add/{task_id}",
+            id="dependency-form"
+        )
+    )
+
+    @staticmethod
+    def complete_task_page(message=None, message_type=None):  
+
+        return c.Titled("Complete Task",
+
+        c.Form(
+            AutoSearch.render(
+                form_id="complete-task-form",
+                hidden_input_id="task_id",
+                entity="tasks-by-user",
+                search_id="task-search",
+                label="Task:",
+                mode="select_one"
+            ),
+
+            c.Button("Complete Task", type="submit"),
+
+            method="POST",
+            action="/task/complete",
+            id="complete-task-form"
+        )
+    )
+
+
+    @staticmethod
+    def remove_dependencies_page(task_id: int, message=None, message_type=None):  
+    
+            return c.Titled("Remove Dependencies Task",
+    
+            c.Form(
+                AutoSearch.render(
+                    form_id="remove-dependency-task-form",
+                    hidden_input_id="dependency_ids",
+                    entity=f"dependencies-by-task/{task_id}",
+                    search_id="task-search",
+                    label="Task:",
+                    mode="select"
+                ),
+    
+                c.Button("Remove Dependencies", type="submit", onclick=f"return confirm('Are you sure you want to remove this dependency?');"),
+    
+                method="POST",
+                action=f"/task/dependencies/remove/{task_id}",
+                id="remove-dependency-task-form"
+            )
         )
 
+    
+
+    
+    
+
+    
 
 
-    @staticmethod
-    def search_bar():
-        return c.Div(c.Label('Dependencies: ', c.Input(type='search', id='search', placeholder='Search for the tasks')))
 
     @staticmethod
     def view_tasks_page(message=None, message_type=None, tasks=None):
@@ -276,7 +264,7 @@ class Pages:
                 c.Form(
                     c.Button(
                         c.Div(
-                            c.H3(task["title"]),
+                            c.H3(task["name"]),
                             c.P(f'Deadline: {task["deadline"]}')
                         ),
                         type="submit"
@@ -290,6 +278,3 @@ class Pages:
     )
 
 
-
-
-                        

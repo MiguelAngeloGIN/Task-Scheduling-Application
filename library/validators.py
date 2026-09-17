@@ -79,17 +79,6 @@ class InputValidator:
 
         return password
 
-    @staticmethod
-    def validate_difficulty(data):
-        ALLOWED_DIFFICULTIES = [1, 2, 3, 4, 5]  # Assuming difficulty is rated on a scale of 1 to 5
-        
-        if not isinstance(data, (int, float)):
-            raise ValueError("Task difficulty must be a number.")
-        
-        if data not in ALLOWED_DIFFICULTIES:
-            raise ValueError(f"Task difficulty must be one of: {', '.join(map(str, ALLOWED_DIFFICULTIES))}")
-        
-        return data
 
     @staticmethod
     def validate_importance(data):
@@ -103,29 +92,17 @@ class InputValidator:
         
         return data
 
-    @staticmethod
-    def validate_duration(data):
-        if not isinstance(data, int):
-            raise ValueError("Task duration must be an integer.")
-        
-        if data < 10:
-            raise ValueError("Task duration must be at least 10 minutes.")
-        
-        return data
-
+    
     @staticmethod
     def validate_deadline(data):
         if not isinstance(data, datetime):
             raise ValueError("Task deadline must be a date.")
 
-        # Ensure the datetime is timezone-aware
-        if data.tzinfo is None or data.tzinfo.utcoffset(data) is None:
-            raise ValueError("Task deadline must be timezone-aware.")
-
-        if data <= datetime.now(timezone.utc):
+        if data <= datetime.now():
             raise ValueError("Task deadline must be a future date.")
 
         return data
+
 
     @staticmethod 
     def validate_id(id_value):

@@ -5,8 +5,12 @@ session = models.session
 class Get_Sql:
 
     @staticmethod
-    def get_sql(model, **kwargs):
+    def get_sql(model, *filters, **kwargs):
         query = session.query(model)
+
+        for condition in filters:
+            query = query.filter(condition)
+
         for key, value in kwargs.items():
             if hasattr(model, key):
                 query = query.filter(getattr(model, key) == value)
@@ -14,7 +18,10 @@ class Get_Sql:
                 raise ValueError(f"{model.__name__} has no attribute '{key}'.")
         results = query.all()
         return results
-        
+
+
+
+
     @staticmethod
     def search_by_company_sql(model, company_id, query, attribute):
         if not hasattr(model, attribute):
