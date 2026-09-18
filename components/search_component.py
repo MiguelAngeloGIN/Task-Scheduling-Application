@@ -1,5 +1,5 @@
+
 from fasthtml import common as c
-from typing import Optional
 
 
 class AutoSearch:

@@ -1,11 +1,16 @@
-from services.query_service import QueryService
 from typing import Optional
-from core.app import rt
-from permissions.decorators import admin_required, leader_required, leader_or_admin_required, auth_required
+
 from starlette.responses import JSONResponse
 
+from core.app import rt
+from permissions.decorators import (
+    admin_required,
+    auth_required,
+    leader_required,
+)
+from services.query_service import QueryService
 
- 
+
 @rt("/search-user", methods=["GET"])  
 @admin_required
 def search_user_by_email(request, query: Optional[str] = None):

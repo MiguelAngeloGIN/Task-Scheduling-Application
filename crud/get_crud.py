@@ -28,7 +28,7 @@ class Get_Sql:
             raise ValueError(f"{model.__name__} has no attribute '{attribute}'.")
 
         return session.query(model).filter(
-            getattr(model, "company_id") == company_id,
+            model.company_id == company_id,
             getattr(model, attribute).like(f"%{query}%")
         ).all()
 

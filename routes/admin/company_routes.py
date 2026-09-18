@@ -1,12 +1,12 @@
-from services.company_service import CompanyService
-from services.team_service import TeamService
-from services.query_service import QueryService
 from typing import Optional
-from components.company_team_objective_components import Pages
+
 from fasthtml import common as c
+
+from components.company_team_objective_components import Pages
 from core.app import rt
 from permissions.decorators import admin_required
-from utils.json_util import parse_json_input
+from services.company_service import CompanyService
+from services.query_service import QueryService
 
 
 @rt('/admin/company/create', methods=['GET'])
@@ -96,7 +96,7 @@ def get_accept_invitation(request, token: str, message: Optional[str] = "", mess
         user_id = user.user_id
         company_id = invitation.company_id
         CompanyService.accept_invitation( company_id=company_id, user_id=user_id, token=token)
-        return c.RedirectResponse(f'/dashboard?message=Invitation accepted successfully&message_type=success', status_code=302)
+        return c.RedirectResponse('/dashboard?message=Invitation accepted successfully&message_type=success', status_code=302)
       except ValueError as e:
         return Pages.accept_invite_page(message=f'{str(e)}', message_type='error')
 

@@ -1,6 +1,7 @@
+import os
 import smtplib
 from email.message import EmailMessage
-import os
+
 from dotenv import load_dotenv
 
 load_dotenv()  
@@ -27,5 +28,4 @@ def send_email(to_email, subject, body, html=False):
             server.ehlo()
             server.login(msg['From'], email_password)
             server.send_message(msg)
-        return
 

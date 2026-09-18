@@ -3,7 +3,6 @@ from database import models
 from library.validators import InputValidator
 
 
-
 class QueryService:
     @staticmethod
     def get_company_users(admin_id):

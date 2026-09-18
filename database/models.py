@@ -1,7 +1,16 @@
-from database import db_connection
-from sqlalchemy import Integer, String, Numeric, Boolean, Column, ForeignKey, JSON, TIMESTAMP, func
-from sqlalchemy.orm import declarative_base, sessionmaker, relationship
+from sqlalchemy import (
+    TIMESTAMP,
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    func,
+)
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
+from database import db_connection
 
 Base = declarative_base()
 

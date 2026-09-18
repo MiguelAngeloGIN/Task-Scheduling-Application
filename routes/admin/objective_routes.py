@@ -1,16 +1,14 @@
-from services.objective_service import ObjectiveService 
-from services.task_service import TaskService
 from typing import Optional
+
+from fasthtml import common as c
+
 from components.company_team_objective_components import Pages
 from components.task_components import Pages as TaskPages
-from fasthtml import common as c
 from core.app import rt
-from services.query_service import QueryService
 from permissions.decorators import admin_required, auth_required
-
-
-
-
+from services.objective_service import ObjectiveService
+from services.query_service import QueryService
+from services.task_service import TaskService
 
 
 @rt('/admin/objective/create', methods= ['GET'])

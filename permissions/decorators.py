@@ -1,8 +1,9 @@
 from functools import wraps
+
 from fasthtml import common as c
 
-from utils.jwt_util import JWTUtils
 from services.query_service import QueryService
+from utils.jwt_util import JWTUtils
 
 
 def admin_required(func):

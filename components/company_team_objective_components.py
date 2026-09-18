@@ -1,4 +1,5 @@
 from fasthtml import common as c
+
 from components.search_component import AutoSearch
 
 

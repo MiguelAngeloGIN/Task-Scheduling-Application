@@ -1,4 +1,6 @@
 from fasthtml import common as c
+
+
 class Pages:
     @staticmethod
     def signup_page(message=None, message_type=None, first_name='', last_name='', email='', action = '/auth/signup'):

@@ -1,14 +1,10 @@
+from crud.add_crud import Add_Sql
+from crud.delete_crud import Delete_Sql
 from crud.get_crud import Get_Sql
 from crud.update_crud import Update_Sql
-from crud.delete_crud import Delete_Sql
-from crud.add_crud import Add_Sql
-from services.query_service import QueryService
 from database import models
-from utils.db_query_util import query_handling
 from library.validators import InputValidator
-from utils.db_query_util import transaction
-
-
+from utils.db_query_util import query_handling, transaction
 
 
 class TeamService:

@@ -1,5 +1,6 @@
-from utils.email_util import send_email
 from library.validators import InputValidator
+from utils.email_util import send_email
+
 
 class EmailService:
     @staticmethod

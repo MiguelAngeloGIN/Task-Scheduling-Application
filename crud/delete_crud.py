@@ -13,7 +13,7 @@ class Delete_Sql:
             instance = session.query(model).filter_by(**pk_value).first()
 
         else:
-            pk_column = list(model.__table__.primary_key.columns)[0]
+            pk_column = next(iter(model.__table__.primary_key.columns))
             instance = session.query(model).filter(pk_column == pk_value).first()
 
         if not instance:
@@ -32,4 +32,3 @@ class Delete_Sql:
 
         for dependency in dependencies:
             session.delete(dependency)
-        return

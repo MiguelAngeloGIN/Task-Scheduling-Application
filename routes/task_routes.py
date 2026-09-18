@@ -1,14 +1,12 @@
-from services.task_service import TaskService
-from services.team_service import TeamService
-from services.query_service import QueryService
-from datetime import timezone, datetime
 from typing import Optional
-from components.task_components import Pages
+
 from fasthtml import common as c
+
+from components.task_components import Pages
 from core.app import rt
 from permissions.decorators import auth_required, leader_required
-from utils.jwt_util import JWTUtils
-from starlette.responses import JSONResponse
+from services.query_service import QueryService
+from services.task_service import TaskService
 from utils.json_util import parse_json_input
 
 
@@ -36,7 +34,7 @@ def post_create_task(request, name: str, description: str, deadline: str, import
                             author_id=user_id, team_id=team.team_id, objective_id=objective_id)
           
 
-          return c.RedirectResponse(f'/leader-dashboard?&message=Task created successfully&message_type=success', status_code = 302)
+          return c.RedirectResponse('/leader-dashboard?&message=Task created successfully&message_type=success', status_code = 302)
     
     except Exception as e:
          return Pages.create_task_page(message=str(e),message_type="error", task_name=name, description=description,
@@ -76,7 +74,7 @@ def post_update_task(request, task_id: int, name: str, description: str, deadlin
                       ):
     try:
         TaskService.update_task(task_id, name=name, description=description, deadline=deadline, importance=importance)
-        return c.RedirectResponse(f'/leader-dashboard?&message=Task updated successfully&message_type=success', status_code = 302)
+        return c.RedirectResponse('/leader-dashboard?&message=Task updated successfully&message_type=success', status_code = 302)
     except Exception as e:
         task = QueryService.get_task(task_id)
         return Pages.update_task_page(task=task, message=str(e), message_type="error")
@@ -97,7 +95,7 @@ def post_add_dependencies(request, task_id: int, dependency_id: str):
 
         TaskService.add_dependencies(dependant_id=task_id, dependency_ids=dependency_ids)
 
-        return c.RedirectResponse(f'/leader-dashboard?&message=Dependencies added successfully&message_type=success', status_code = 302)
+        return c.RedirectResponse('/leader-dashboard?&message=Dependencies added successfully&message_type=success', status_code = 302)
     except Exception as e:
         return c.RedirectResponse(f'/leader-dashboard?&message={str(e)}&message_type=error', status_code = 302)
 
@@ -115,7 +113,7 @@ def post_remove_dependencies(request, task_id: int, dependency_ids: str):
     try:
         dependency_ids_list = parse_json_input(dependency_ids)
         TaskService.remove_dependencies(task_id=task_id, dependency_ids_pk=dependency_ids_list)
-        return c.RedirectResponse(f'/leader-dashboard?&message=Dependencies removed successfully&message_type=success', status_code = 302)
+        return c.RedirectResponse('/leader-dashboard?&message=Dependencies removed successfully&message_type=success', status_code = 302)
     except Exception as e:
         return c.RedirectResponse(f'/leader-dashboard?&message={str(e)}&message_type=error', status_code = 302)
 
@@ -157,7 +155,7 @@ def post_remove_task(request, task_id: int):
         author_id = author.user_id
         
         TaskService.delete_task(task_id=task_id, author_id=author_id)
-        return c.RedirectResponse(f'/leader-dashboard?&message=Task removed successfully&message_type=success', status_code = 302)
+        return c.RedirectResponse('/leader-dashboard?&message=Task removed successfully&message_type=success', status_code = 302)
     except Exception as e:
         return c.RedirectResponse(f'/leader-dashboard?&message={str(e)}&message_type=error', status_code = 302)
 

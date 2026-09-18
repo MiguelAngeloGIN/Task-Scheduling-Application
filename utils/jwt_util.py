@@ -1,6 +1,8 @@
-import jwt, os
-from dotenv import load_dotenv
+import os
 from typing import Optional
+
+import jwt
+from dotenv import load_dotenv
 
 load_dotenv() 
 secret_key = os.getenv("JWT_SECRET_KEY")

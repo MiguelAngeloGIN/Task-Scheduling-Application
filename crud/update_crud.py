@@ -6,7 +6,7 @@ class Update_Sql:
 
     @staticmethod
     def update_sql(model, **kwargs):
-        pk_column = list(model.__table__.primary_key.columns)[0]
+        pk_column = next(iter(model.__table__.primary_key.columns))
         pk_name = pk_column.name
         pk_value = kwargs.pop(pk_name)
         

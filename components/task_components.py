@@ -1,5 +1,7 @@
 from fasthtml import common as c
+
 from components.search_component import AutoSearch
+
 
 class Pages:
     @staticmethod
@@ -8,8 +10,7 @@ class Pages:
                      c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P()),
                         c.P('Welcome to your dashboard!'),
                         c.Div(c.Form(c.Button('Logout', type='submit'), method='POST', action='auth/logout')),
-                        c.Div(c.Form(c.Button('VIEW TASKS', type = "submit"), method='GET', action='/view_tasks')),
-                        c.Div(c.Form(c.Button('COMPLETE TASKS', type = "submit"), method='GET', action='/complete-tasks'))
+                        c.Div(c.Form(c.Button('COMPLETE TASKS', type = "submit"), method='GET', action='/task/complete'))
                         )
 
     @staticmethod
@@ -20,7 +21,7 @@ class Pages:
                         c.Div(c.Form(c.Button('Logout', type='submit'), method='POST', action='auth/logout')),
                         c.Div(c.Form(c.Button('CREATE TASK', type = "submit"), method='GET', action='/task/create')),
                         c.Div(c.Form(c.Button('MANAGE TASKS', type="submit"), method='GET', action='/tasks/manage')),
-                        c.Div(c.Form(c.Button('COMPLETE TASK', type = "submit"),method='GET', action=f'/task/complete')),
+                        c.Div(c.Form(c.Button('COMPLETE TASK', type = "submit"),method='GET', action='/task/complete')),
                         c.Div(c.Form(c.Button('VIEW OBJECTIVES SCHEDULE', type = "submit"), method='GET', action='/admin/objective/view'))
                         )
 
@@ -133,7 +134,7 @@ class Pages:
                     search_id="task-search",
                     label="Task:",
                     mode="redirect",
-                    redirect_url=f"/task/manage/action"
+                    redirect_url="/task/manage/action"
                 )
             ),
 
@@ -233,7 +234,7 @@ class Pages:
                     mode="select"
                 ),
     
-                c.Button("Remove Dependencies", type="submit", onclick=f"return confirm('Are you sure you want to remove this dependency?');"),
+                c.Button("Remove Dependencies", type="submit", onclick="return confirm('Are you sure you want to remove this dependency?');"),
     
                 method="POST",
                 action=f"/task/dependencies/remove/{task_id}",

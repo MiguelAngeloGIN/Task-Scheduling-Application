@@ -1,8 +1,10 @@
-from services.auth_service import AuthService
 from typing import Optional
-from components.auth_components import Pages
+
 from fasthtml import common as c
+
+from components.auth_components import Pages
 from core.app import rt
+from services.auth_service import AuthService
 from services.query_service import QueryService
 from utils.jwt_util import JWTUtils
 
