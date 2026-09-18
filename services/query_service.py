@@ -35,7 +35,7 @@ class QueryService:
         return user[0]
 
     @staticmethod
-    def get_company_teams(admin_id):
+    def get_company_teams(admin_id, query=None):
         InputValidator.validate_id(admin_id)
 
         admin = Get_Sql.get_sql(models.User, user_id=admin_id)
@@ -48,7 +48,11 @@ class QueryService:
         if admin.company_id is None:
             raise ValueError("Admin does not belong to a company.")
 
-        return Get_Sql.get_sql(models.Team, company_id=admin.company_id)
+        filters = [models.Team.company_id == admin.company_id]
+        if query:
+            filters.append(models.Team.name.ilike(f"%{query}%"))
+
+        return Get_Sql.get_sql(models.Team, *filters)
 
     @staticmethod
     def get_company_team(team_id, company_id):

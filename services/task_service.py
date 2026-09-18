@@ -167,14 +167,15 @@ class TaskService:
     def complete_task(task_id, author_id):
 
         task_id = InputValidator.validate_id(task_id)
-        task = Get_Sql.get_sql(models.Task, task_id=task_id)[0]
+        tasks = Get_Sql.get_sql(models.Task, task_id=task_id)
+        if not tasks:
+            raise ValueError("Task not found.")
+        task = tasks[0]
 
         if task.status == "completed":
             raise ValueError("Task already completed.")
 
         Update_Sql.update_sql(models.Task, task_id=task_id,status="completed")
-
-        #ObjectiveService.update_progress(task.objective_id)
 
         Delete_Sql.delete_dependencies_by_task(task_id)
 
@@ -186,9 +187,9 @@ class TaskService:
     
 
     @staticmethod
-    def get_sorted_tasks_by_team(team_id): # still gotta check it later
-        team_id = InputValidator.validate_id(team_id)
-        tasks = Get_Sql.get_sql(models.Task, team_id=team_id)
+    def get_sorted_tasks_by_objective(objective_id): # still gotta check it later
+        objective_id = InputValidator.validate_id(objective_id)
+        tasks = Get_Sql.get_sql(models.Task, objective_id=objective_id)
 
         if not tasks:
             raise ValueError("No tasks found.")
@@ -198,7 +199,7 @@ class TaskService:
         date_now = datetime.now(timezone.utc).replace(tzinfo=None)
 
         for task in tasks:
-            deadlines.append(task ["deadline"])
+            deadlines.append(task.deadline)
 
         deadline_differences = [] # convert deadlines to time differences from now 
         for d in deadlines:
@@ -211,22 +212,21 @@ class TaskService:
         prioritized_tasks= []
 
         for task in tasks:
-            deadline = (task["deadline"] - date_now) # convert deadline to time difference from now to normalize it
-            importance = task["importance"]
+            deadline = (task.deadline - date_now) # convert deadline to time difference from now to normalize it
+            importance = task.importance
           
 
             priority = PriorityService.calculate_priority(deadline, importance, max_deadline, min_deadline )
 
-            task["priority_score"] = priority
+            task.priority_score = priority
             prioritized_tasks.append(task)
 
 
         sorted_tasks_by_priority = PriorityService.sort_tasks_by_priority(prioritized_tasks)
 
-        dependecies = Get_Sql.get_sql(models.Dependency, team_id=team_id)
+        dependencies = QueryService.get_dependencies_by_objective(objective_id)
 
-        sorted_tasks = PriorityService.apply_dependency_order(sorted_tasks_by_priority, dependecies)
-
+        sorted_tasks = PriorityService.apply_dependency_order(sorted_tasks_by_priority, dependencies)
 
         return sorted_tasks
     

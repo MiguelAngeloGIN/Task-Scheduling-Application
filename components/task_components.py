@@ -21,7 +21,7 @@ class Pages:
                         c.Div(c.Form(c.Button('CREATE TASK', type = "submit"), method='GET', action='/task/create')),
                         c.Div(c.Form(c.Button('MANAGE TASKS', type="submit"), method='GET', action='/tasks/manage')),
                         c.Div(c.Form(c.Button('COMPLETE TASK', type = "submit"),method='GET', action=f'/task/complete')),
-                        c.Div(c.Form(c.Button('VIEW SCHEDULE', type = "submit"), method='GET', action='/tasks/view-schedule'))
+                        c.Div(c.Form(c.Button('VIEW OBJECTIVES SCHEDULE', type = "submit"), method='GET', action='/admin/objective/view'))
                         )
 
 
@@ -241,40 +241,46 @@ class Pages:
             )
         )
 
-    
 
-    
-    
 
-    
+
 
 
 
     @staticmethod
-    def view_tasks_page(message=None, message_type=None, tasks=None):
+    def view_tasks_schedule_page(message=None, message_type=None, tasks=None, dashboard_link='/dashboard'):
         if tasks is None:
             tasks = []
-        return c.Titled(
-        'Task Schedule',
-        c.A('Back to Dashboard', href='/dashboard'),
-        c.Div(c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
-            c.H2('Your Scheduled Tasks'),
+
+        return c.Titled('Task Schedule',
+                        c.A('Back to Dashboard',href=dashboard_link
+                            ),
+
+                         c.Div(
+                             c.P(f'{message}', cls=f"message {message_type}") if message else c.P(),
+
+                         c.H2('Your Scheduled Tasks'),
 
             *[
-                c.Form(
-                    c.Button(
-                        c.Div(
-                            c.H3(task["name"]),
-                            c.P(f'Deadline: {task["deadline"]}')
-                        ),
-                        type="submit"
+                c.Div(
+                    c.H3(f"{task.objective.name}: {task.name}"),
+
+                    c.P(
+                        f"Deadline: {task.deadline}"
                     ),
-                    method="GET",
-                    action=f"/task/{task['_id']}"
+                    cls="task-card"
                 )
                 for task in tasks
             ]
         )
     )
+
+    
+
+    
+    
+
+    
+
 
 

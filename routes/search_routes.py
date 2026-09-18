@@ -64,10 +64,11 @@ def search_all_users(request, query: Optional[str] = None):
 
 
 @rt("/search-company-objectives", methods=["GET"])
-@leader_or_admin_required
+@auth_required
 def search_company_objectives(request, query: Optional[str] = None):
 
-    user = request.state.user
+    payload =  request.state.user_payload
+    user = QueryService.get_user(payload["sub"])
     company_id = user.company_id
 
     objectives = QueryService.get_objectives_by_company(company_id, query) if company_id else []
@@ -154,3 +155,5 @@ def search_dependencies_by_task(request, task_id: int, query: Optional[str] = No
         }
         for dependency in dependencies
     ])
+
+

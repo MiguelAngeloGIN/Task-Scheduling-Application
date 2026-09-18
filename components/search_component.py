@@ -146,7 +146,6 @@ class AutoSearch:
             
             }
 
-
         });
         """
 
@@ -158,6 +157,39 @@ class AutoSearch:
         script = script.replace("{redirect_url}", redirect_url or "")
 
         return c.Script(script)
+
+
+
+    @staticmethod
+    def filter_script():
+        return c.Script("""
+        document.addEventListener("DOMContentLoaded", () => {
+
+        function setupFilter(inputId, cardClass, dataAttribute) {
+            const filterInput = document.getElementById(inputId);
+
+            if (!filterInput) return;
+
+            filterInput.addEventListener("input", () => {
+                const query = filterInput.value.toLowerCase();
+
+                document.querySelectorAll(cardClass).forEach(card => {
+                    const name = card.dataset[dataAttribute];
+
+                    if (name.includes(query)) {
+                        card.style.display = "";
+                    } else {
+                        card.style.display = "none";
+                    }
+                });
+            });
+        }
+
+        setupFilter("team-filter", ".team-card", "teamName");
+        setupFilter("objective-filter", ".objective-card", "objectiveName");
+
+    });
+    """)
 
 
     @staticmethod

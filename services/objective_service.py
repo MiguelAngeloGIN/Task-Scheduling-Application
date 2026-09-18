@@ -31,13 +31,30 @@ class ObjectiveService:
     def archive_objective(objective_id):
         objective_id = InputValidator.validate_id(objective_id)
 
-        old_objective = Get_Sql.get_sql(models.Objective, objective_id=objective_id)
-        if not old_objective:
+        objective = Get_Sql.get_sql(models.Objective, objective_id=objective_id)
+        if not objective:
             raise ValueError("Objective not found.")
-        old_objective = old_objective[0]
 
-        Update_Sql.update_sql(models.Objective, objective_id=objective_id, archived=True)
+        query_handling(Update_Sql.update_sql, model=models.Objective, objective_id=objective_id, archived=True, error="Failed to archive objective.")
 
         return True
+
+
+    @staticmethod
+    @transaction
+    def calculate_objective_progress(objective_id):
+        objective_id = InputValidator.validate_id(objective_id)
+
+        objective = Get_Sql.get_sql(models.Objective, objective_id=objective_id)
+        if not objective:
+            raise ValueError("Objective not found.")
+        
+        tasks = Get_Sql.get_sql(models.Task, objective_id=objective_id)
+        if not tasks:
+            return 0
+
+        completed_tasks = [task for task in tasks if task.status == "completed"]
+        progress = (len(completed_tasks) / len(tasks)) * 100
+        return round(progress)
 
   

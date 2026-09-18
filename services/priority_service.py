@@ -26,9 +26,9 @@ class PriorityService:
 
        
         if max_deadline == min_deadline:
-            raise ValueError("Max and min deadlines cannot be the same.")
-        
-        normalized_deadline = 1 - (deadline - min_deadline)/ (max_deadline - min_deadline)
+            normalized_deadline = 1
+        else:
+            normalized_deadline = 1 - (deadline - min_deadline)/ (max_deadline - min_deadline)
 
         normalized_importance = (importance - 1) / 4 
 
@@ -44,7 +44,7 @@ class PriorityService:
     
         return sorted(
         tasks, 
-        key=lambda task: task.get('priority_score', 0), 
+        key=lambda task: task.priority_score, 
         reverse=True
     )
 
@@ -61,7 +61,7 @@ class PriorityService:
             list: Reordered list of tasks respecting dependencies.
         """
 
-        task_dict = {task.id: task for task in sorted_tasks}
+        task_dict = {task.task_id: task for task in sorted_tasks}
         ordered_tasks = []
         visited = set()
 
@@ -76,7 +76,7 @@ class PriorityService:
                 ordered_tasks.append(task_dict[task_id])
 
         for task in sorted_tasks:
-            visit(task.id)
+            visit(task.task_id)
 
         return ordered_tasks
 

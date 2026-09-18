@@ -211,3 +211,24 @@ def post_remove_team_leader(request, user_id: str, team_id: str):
                                     warning = 'After removing the team leader you will be required to assign a new leader',
                                     title='Remove Team Leader', action='/admin/team/remove-leader', user_mode='select_one'
                                     )
+
+
+
+
+@rt("/admin/team/view", methods=["GET"])
+@admin_required
+def view_teams(request):
+    try:
+        admin_payload = request.state.admin_payload
+        admin_id = int(admin_payload["sub"])
+
+        teams = QueryService.get_company_teams(admin_id)
+
+        return Pages.view_teams_page(teams)
+
+    except ValueError as e:
+        return Pages.admin_dashboard_page(
+            message=str(e),
+            message_type="error"
+        )
+

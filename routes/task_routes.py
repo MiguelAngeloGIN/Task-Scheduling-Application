@@ -121,11 +121,6 @@ def post_remove_dependencies(request, task_id: int, dependency_ids: str):
 
 
 
-
-
-
-
-
 @rt('/task/complete', methods=['GET'])
 @auth_required
 def get_complete_task(request, message: Optional[str] = None, message_type: Optional[str] = None):
@@ -154,10 +149,6 @@ def post_complete_task(request, task_id: int):
         return Pages.complete_task_page(message=str(e), message_type="error")
 
 
-
-
-
-
 @rt('/task/remove/{task_id}', methods=['POST'])
 @leader_required
 def post_remove_task(request, task_id: int):
@@ -169,3 +160,8 @@ def post_remove_task(request, task_id: int):
         return c.RedirectResponse(f'/leader-dashboard?&message=Task removed successfully&message_type=success', status_code = 302)
     except Exception as e:
         return c.RedirectResponse(f'/leader-dashboard?&message={str(e)}&message_type=error', status_code = 302)
+
+
+
+
+
