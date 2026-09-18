@@ -135,6 +135,9 @@ create index idx_user_led_team on user(led_team_id);
 use Scheduler;
 
 
+
+
+
 select * from invitation;
 select * from user;
 select * from teammember;
